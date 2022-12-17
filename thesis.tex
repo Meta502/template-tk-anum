@@ -62,7 +62,69 @@ Interpolasi merupakan teknik yang digunakan untuk membangun suatu fungsi yang me
 Secara matematis, sebuah fungsi interpolasi dapat dinyatakan sebagai suatu fungsi \(P(x)\) dimana \(x\) adalah sebuah titik yang ingin di-interpolasi. Hasil dari fungsi tersebut adalah sebuah value yang merupakan aproksimasi dari nilai fungsi \(f(x)\) yang melewati seluruh titik-titik diskret yang nilainya sudah diketahui.
 
 Pada paper ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline} - atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural} - untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). Cubic spline dapat didefinisikan sebagai suatu \emph{piecewise polyomial function} yang menginterpolasi sebuah titik
-\section{Implementasi Parametric Natural Cubic Spline}
+\section{Metode Integrasi Romberg}
+Hello
+\subsection{Pengenalan Algoritma Romberg}
+\emph{Romberg Integration} merupakan metode integrasi yang menggunakan prinsip \emph{trapezoidal rule} dan meningkatkan akurasi dengan melakukan ekstrapolasi melalui \emph{Richardson's Extrapolation}.
+
+\emph{Romberg} bekerja dengan menggunakan \emph{Trapezoidal Rule} sebagai basis dari perhitungan dan melakukan iterasi dengan melakukan pembagian interval untuk meningkatkan akurasi. Basis ini diiterasi per-baris pada suatu tabel Romberg yang memiliki ukuran \(R(n,n)\) melalui rumus
+
+\begin{equation*}
+	\begin{split}
+		R(1,1) & = (b-a)\frac{f(a)+f(b)}{2} \\
+		R(j,1) & = \frac{1}{2}R_{j-1,1}+h_j\sum_{i=1}^{2^{j-2}}f(a+(2i-1)h_j)
+	\end{split}
+\end{equation*}
+
+Jika dilihat, \(R(1,1)\) perlu diinisiasi terlebih dahulu karena untuk iterasi berikutnya, akan menggunakan hasil dari iterasi sebelumnya karena bersifat \emph{evolutionary} dengan arti meningkatkan akurasi dari iterasi sebelumnya dengan membagi interval \(h\) menjadi lebih kecil. Nilai \(h\) ini diperkecil setiap iterasi melalui rumus
+
+\begin{equation*}
+	\begin{split}
+		h_j & = \frac{b-a}{2^{j-1}}
+	\end{split}
+\end{equation*}
+
+Dari sini, kita bisa membentuk tabel Romberg \(R\) yang memiliki iterasi \emph{trapezoidal rule} dengan iterasi setiap baris, di mana semakin banyak iterasi (dan baris semakin ke bawah), maka akurasi akan semakin meningkat karena memiliki jarak interval \(h\) yang semakin kecil.
+
+Untuk setiap baris, kita bisa menemukan akurasi yang lebih tinggi dengan mengekstrapolasi menggunakan \emph{Richardson's Extrapolation} yang mengekstrapolasi hasil dari \emph{Trapezoidal Rule} yang diperoleh. Rumus \emph{Richardson's Extrapolation} yang sudah diadaptasi untuk algoritma Romberg ini dapat dilihat sebagai berikut
+
+\begin{equation*}
+	\begin{split}
+		R_{j,k} & = \frac{4^{k-1}R_{j,k-1}-R_{j-1,k-1}}{4^{k-1}-1}
+	\end{split}
+\end{equation*}
+
+Dengan demikian, kita bisa mengerti bahwa algoritma Romberg melakukan integrasi dengan membangun tabel Romberg \(R\) dengan ukuran \(R(n,n)\) dan mengisi tabel tersebut sehingga membentuk \emph{lower triangular matrix} di mana setiap baris merupakan iterasi \emph{trapezoidal rule} dan setiap kolom merupakan peningkatan akurasi dari \emph{trapezoidal rule} baris tersebut menggunakan \emph{richardson's extrapolation} dengan meningkatkan \emph{order of accuracy} melalui hasil yang diperoleh pada iterasi-iterasi sebelumnya (yang akan dibahas pada \emph{subsection} toleransi eror di bawah). Dengan demikian, sebuah tabel Romberg yang dihasilkan dapat divisualisasikan sebagai berikut
+
+\begin{center}
+	\begin{tabular}{ c | c c c c c }
+
+		j/k        & \(R(j,0)\) & \(R(j,1)\) & \(R(j,2)\) & \(R(j,3)\) & \(\cdots\) \\
+		\hline
+		0          & \(R(0,0)\) & -          & -          & -          & -          \\
+		1          & \(R(1,0)\) & \(R(1,1)\) & -          & -          & -          \\
+		2          & \(R(2,0)\) & \(R(2,1)\) & \(R(2,2)\) & -          & -          \\
+		3          & \(R(3,0)\) & \(R(3,1)\) & \(R(3,2)\) & \(R(3,3)\) & -          \\
+		\(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\ddots\) \\
+	\end{tabular}
+\end{center}
+
+Sesuai dengan prinsip yang dijelaskan di atas, akurasi ditingkatkan dengan ekstrapolasi setiap kolomnya dengan semakin meningkat kolom (semakin ke kanan), maka hasil akan semakin akurat. Dengan demikian, nilai paling akurat untuk setiap iterasi berada pada diagonal matriks tersebut. Maka dari itu, untuk memperoleh hasil integrasi, diambil elemen diagonal pada baris terakhir, yaitu \(R(j,j)\). Dengan demikian, dapat disimpulkan hasil integrasi melalui Romberg sebagai
+\begin{equation*}
+	\begin{split}
+		\int_{a}^{b} f(x) \,dx & = R(j,j)
+	\end{split}
+\end{equation*}
+
+\subsection{Implementasi Algoritma Romberg}
+Untuk tugas kelompok kedua ini, diberikan fungsi distribusi normal tabel Z sebagai berikut
+\begin{equation*}
+	\begin{split}
+		P(Z <= z ) & = \phi(z) = \int_{-\infty}^{z} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
+	\end{split}
+\end{equation*}
+
+
 
 \section{Kesimpulan}
 Kesimpulan disini.
