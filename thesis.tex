@@ -1,238 +1,102 @@
-%
-% Template Laporan Skripsi/Thesis Universitas Indonesia
-%
-% @author  Ichlasul Affan, Azhar Kurnia
-% @version 2.1.2
-%
-% Dokumen ini dibuat berdasarkan standar IEEE dalam membuat class untuk
-% LaTeX dan konfigurasi LaTeX yang digunakan Fahrurrozi Rahman ketika
-% membuat laporan skripsi, yang kemudian diadaptasi oleh Andreas Febrian dan
-% Lia Sadita untuk template skripsi tahun 2010.
-% Konfigurasi template sebelumnya telah disesuaikan dengan
-% aturan penulisan thesis yang dikeluarkan UI pada tahun 2017.
-%
+%% Template for ENG 401 reports
+%% by Robin Turner
+%% Adapted from the IEEE peer review template
 
-%
-% Tipe dokumen adalah report dengan satu kolom.
-%
-\documentclass[12pt, a4paper, onecolumn, twoside, final]{report}
-\raggedbottom
+\documentclass[journal,12pt,onecolumn,a4paper]{IEEEtran}
+\usepackage{cite} % Tidies up citation numbers.
+\usepackage{url} % Provides better formatting of URLs.
+\usepackage[utf8]{inputenc} % Allows Turkish characters.
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables for horizontal lines
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage[numbered,framed]{matlab-prettifier}
+\usepackage[export]{adjustbox}
 
-% Load konfigurasi LaTeX untuk tipe laporan thesis
-\usepackage{_internals/uithesis}
-%
+\graphicspath{ {./images/} }
+
+\hyphenation{op-tical net-works semi-conduc-tor} % Corrects some bad hyphenation 
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
 
 
-% Load konfigurasi khusus untuk laporan yang sedang dibuat
-\input{config/settings}
-% Daftar pemenggalan suku kata dan istilah dalam LaTeX
-\include{_internals/hypeindonesia}
-% Daftar istilah yang mungkin perlu ditandai
-\input{config/istilah}
-
-% Awal bagian penulisan laporan
 \begin{document}
-%
-% Sampul Laporan
-\include{_internals/sampul}
-\forceclearchapter
-
-%
-% Gunakan penomeran romawi
-\pagenumbering{roman}
-%
-% Menghilangkan penebalan pada huruf-huruf table of content
-% dari halaman judul hingga daftar lampiran
-\disableboldchapterintoc
-%
-% load halaman judul dalam
-\addChapter{HALAMAN JUDUL}
-\include{_internals/judul_dalam}
-\forceclearchapter
-
-%
-% load halaman orisinalitas
-
-% Menghilangkan penomoran
-\pagenumbering{gobble}
-
-\strcompare{Laporan Kerja Praktik}{\type}{}
-{
-	\include{src/00-frontMatter/pernyataanOrisinalitas}
-	\forceclearchapter
-}
-
-% Memunculkan penomoran kembali
-\pagenumbering{roman}
-
-%
-% setelah bagian ini, halaman dihitung sebagai halaman ke 2
-\setcounter{page}{2}
-
-%
-% Lembar Penegesahan
-\strcompare{Laporan Kerja Praktik}{\type}
-{
-	% Lembar Pengesahan Kerja Praktik dari LaTeX
-	\addChapter{LEMBAR PERSETUJUAN DOSEN KERJA PRAKTIK}
-	\include{src/00-frontMatter/pengesahanKP}
-	\forceclearchapter
-}
-{
-	\addChapter{LEMBAR PENGESAHAN}
-	% Gunakan salah satu (comment atau hapus kode yang tidak perlu):
-	% Lembar Pengesahan Tugas Akhir dari LaTeX
-	\strcompare{Doktor}{\jenjang}
-	{\include{src/00-frontMatter/pengesahanSidangS3}}
-	{\include{src/00-frontMatter/pengesahanSidang}}
-	\forceclearchapter
-	% Lembar Pengesahan dari PDF lain (misal: generated oleh SISIDANG [Fasilkom])
-	%\putpdf{assets/pdfs/pengesahanSidang.pdf}
-}
+\begin{titlepage}
+	% paper title
+	% can use linebreaks \\ within to get better formatting as desired
+	\title{Interpolasi Numerik: Path Calculator}
 
 
-\strcompare{Laporan Kerja Praktik}{\type}{}
-{
-	%
-	% Kata Pengantar
-	\addChapter{\kataPengantar}
-	\include{src/00-frontMatter/kataPengantar}
-	\forceclearchapter
-	%
-	% Lembar Persetujuan Publikasi Ilmiah
-	\addChapter{LEMBAR PERSETUJUAN PUBLIKASI ILMIAH}
-	\include{src/00-frontMatter/persetujuanPublikasi}
-	\forceclearchapter
-}
+	% author names and affiliations
 
-%
-% Untuk halaman pertama setiap chapter mulai dari abstrak, tetap berikan mark universitas.
-%
-\pagestyle{first-pages}
+	\author{Adrian Ardizza\\
+		Alya Azhar Agharid\\
+		Muhammad Athallah\\
+		Stefanus Ndaru Wedhatama
+	}
 
-%
-\addChapter{ABSTRAK}
-\include{src/00-frontMatter/abstrak}
-%
-%
-\include{src/00-frontMatter/abstract}
+	% make the title area
+	\maketitle
+	\begin{abstract}
+		The abstract does not only mention the paper but is the original paper shrunken to approximately 200 words. It states the purpose, reports the information obtained, and gives conclusions, and recommendations. In short, it summarizes the main points of the study adequately and accurately. It provides information from every major section in the body of the report in a dense and compact way. Past tense and active voice is appropriate when describing what was done. If there is any, it includes key statistical detail.
 
-%
-% Daftar isi, gambar, tabel, dan kode
-%
-\CAPinToC % All entries in ToC will be CAPITALIZED from here on
-\phantomsection %hack to make them clickable
-\singlespacing
-\tableofcontents
-\setstretch{1.4}
-\clearpage
-\phantomsection %hack to make them clickable
-\singlespacing
-\listoffigures
-\setstretch{1.4}
-\clearpage
-\phantomsection %hack to make them clickable
-\singlespacing
-\listoftables
-\setstretch{1.4}
-\clearpage
+		Depending on the format you use, the abstract may come on the title page or at the beginning of the main report.
 
-%
-% Daftar Kode Program
-% Comment to disable.
-%
-\phantomsection %hack to make them clickable
-\addcontentsline{toc}{chapter}{\lstlistlistingname}
-\singlespacing
-\listoflistings
-\setstretch{1.4}
-\clearpage
+	\end{abstract}
+	\tableofcontents
+	\listoffigures
+	\listoftables
+\end{titlepage}
 
-%
-% Daftar Isi yang Didefinisikan Sendiri (Custom)
-% Definisi jenis objek baru dapat dilakukan di uithesis.sty
-% Uncomment to use.
-%
-%\phantomsection %hack to make them clickable
-%\addcontentsline{toc}{chapter}{\listofthingname}
-%\singlespacing
-%\listofthing
-%\setstretch{1.4}
-%\clearpage
+\IEEEpeerreviewmaketitle
 
-%
-% Daftar Equation (Persamaan Matematis)
-% Uncomment to use.
-%
-% \phantomsection %hack to make them clickable
-% \addcontentsline{toc}{chapter}{\listofequname}
-% \singlespacing
-% \listofequ
-% \setstretch{1.4}
-% \clearpage
+\section{Pendahuluan}
+Interpolasi merupakan teknik yang digunakan untuk membangun suatu fungsi yang melewati sebuah himpunan titik-titik diskret yang diketahui. Fungsi interpolasi memiliki aplikasi yang luas pada Ilmu Komputer karena dapat digunakan untuk menggambarkan berbagai kurva kompleks dengan \emph{computational cost} yang relatif murah apabila dibandingkan dengan metode brute-force (mencari seluruh titik yang memenuhi suatu kurva secara \emph{exhaustive}). Interpolasi beberapa titik diskret dapat dicapai dengan berbagai metode interpolasi seperti interpolasi konstan, interpolasi linear, interpolasi polinomial, dan interpolasi \emph{spline} yang menjadi topik dari paper ini.
 
-%
-% Daftar Lampiran
-% Comment to disable.
-%
-\phantomsection %hack to make them clickable
-\addcontentsline{toc}{chapter}{\listofappendixname}
-\singlespacing
-\listofappendix
-\setstretch{1.4}
+Secara matematis, sebuah fungsi interpolasi dapat dinyatakan sebagai suatu fungsi \(P(x)\) dimana \(x\) adalah sebuah titik yang ingin di-interpolasi. Hasil dari fungsi tersebut adalah sebuah value yang merupakan aproksimasi dari nilai fungsi \(f(x)\) yang melewati seluruh titik-titik diskret yang nilainya sudah diketahui.
 
-% Table of content normal lagi hurufnya
-\enableboldchapterintoc
+Pada paper ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline} - atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural} - untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). Cubic spline dapat didefinisikan sebagai suatu \emph{piecewise polyomial function} yang menginterpolasi sebuah titik
+\section{Implementasi Parametric Natural Cubic Spline}
 
-\clearpage
+\section{Kesimpulan}
+Kesimpulan disini.
 
-% Jika penomoran romawi selesai di ganjil
-%\naiveoddclearchapter
-% Jika penomoran romawi selesai di genap
-%\naiveevenclearchapter
+% % Example of a table from http://www.latextemplates.com/template/professional-table
 
-\noCAPinToC % Revert to original \addcontentsline formatting
+\begin{thebibliography}{1}
+	% Here are a few examples of different citations 
+	% Book
+	\bibitem{kopka_1999} % Note the label in the curly brackets. Use the cite the source; e.g., \cite{kopka_latex}
+	H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+	0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+	\bibitem{horowitz_2005}D.~Horowitz, \emph{End of Time}. New York, NY, USA: Encounter Books, 2005. [E-book] Available: ebrary, \url{http://site.ebrary.com/lib/sait/Doc?id=10080005}. Accessed on: Oct. 8, 2008.
+	% Article from database
+	\bibitem{castlevecchi_2008}D.~Castelvecchi, ``Nanoparticles Conspire with Free Radicals'' \emph{Science News}, vol.174, no. 6, p. 9, September 13, 2008. [Full Text]. Available: Proquest, \url{http://proquest.umi.com/pqdweb?index=52&did=1557231641&SrchMode=1&sid=3&Fmt=3&VInst=PROD&VType=PQD&RQT=309&VName=PQD&TS=1229451226&clientId=533}. Accessed on: Aug.~3, 2014.
+	% Conference Paper from the Internet
+	\bibitem{lach_2010}J.~Lach, ``SBFS: Steganography based file system,'' in \emph{Proceedings of the 2008 1st International Conference on Information Technology, IT 2008, 19-21 May 2008, Gdansk, Poland.} Available: IEEE Xplore, \url{http://www.ieee.org}. [Accessed: 10 Sept. 2010].
+	% Web page, no author
+	\bibitem{a_laymans_explanation}``A `layman's' explanation of Ultra Narrow Band technology,'' Oct.~3, 2003. [Online]. Available: \url{http://www.vmsk.org/Layman.pdf}. [Accessed: Dec.~3, 2003].
+\end{thebibliography}
 
-%
-% Gunakan penomeran Arab (1, 2, 3, ...) setelah bagian ini.
-%
-\pagenumbering{arabic}
-\pagestyle{standard}
-% \setlength{\belowcaptionskip}{+2pt}
+% This is a hand-made bibliography. If you want to use a BibTeX file, you're on your own ;-)
 
 
-\setoddevenheader
-\include{src/01-body/bab1}
-\clearchapter
-\include{src/01-body/bab2}
-\clearchapter
-\include{src/01-body/bab3}
-\clearchapter
-\include{src/01-body/bab4}
-\clearchapter
-\include{src/01-body/bab5}
-\clearchapter
-\include{src/01-body/kesimpulan}
-\clearchapter
 
-%
-% Daftar Pustaka
-\CAPinToC % All entries in ToC will be CAPITALIZED from here on
-\include{_internals/pustaka}
-\clearchapter
-\noCAPinToC % Revert to original \addcontentsline formatting
 
-%
-% Lampiran
-%
-\begin{appendix}
-	\newcounter{pagetemp}
-	\setcounter{pagetemp}{\thepage}
-	\include{_internals/markLampiran}
-	\clearchapter
-	\setcounter{page}{\thepagetemp}
-	\stepcounter{page}
-	\include{src/99-backMatter/lampiran}
-\end{appendix}
+
+
+
+
+
+
+
+
+
 
 \end{document}
