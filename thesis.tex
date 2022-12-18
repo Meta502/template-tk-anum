@@ -76,9 +76,9 @@ Metode Simpson didasari oleh interpolasi pada tiga titik, yaitu \emph{a}, \(\mat
 Dengan demikian, diperoleh rumus pendekatan berikut dengan menghitung integral dari polinomial di atas.
 
 \begin{flalign*}
-	S_{f} & = \int_{a}^{b}p_{2}(x)dx &&\\
-	      & = \int_{a}^{b}\left \{ f(a)+\frac{f(c)-f(a)}{(c-a)}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c) \right \}dx &&\\
-	      & = \frac{(b-a)}{6}\left \{ f(a)+4f(c)+f(b) \right \} &&
+	S_{f} & = \int_{a}^{b}p_{2}(x)dx                                                                                         &  & \\
+	      & = \int_{a}^{b}\left \{ f(a)+\frac{f(c)-f(a)}{(c-a)}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c) \right \}dx &  & \\
+	      & = \frac{(b-a)}{6}\left \{ f(a)+4f(c)+f(b) \right \}                                                              &  &
 \end{flalign*}
 
 Metode Simpson dapat memberikan hasil yang eksak untuk polinomial dengan orde dua (\(\mathrm{f(x)=x^{2}}\)).
@@ -99,7 +99,7 @@ Misalkan pada interval \(\mathrm{[a,b]}\) didefinisikan titik-titik \(\mathrm{a=
 	\end{split}
 \end{equation*}
 
-Dengan menerapkan aturan komposit pada metode Simpson, didapatkan rumus berikut sebagai rumus metode komposit Simpson.
+Dengan menerapkan aturan komposit pada metode Simpson (\emph{n} merupakan jumlah partisi yang dibentuk untuk menyelesaikan permasalahan), didapatkan rumus berikut sebagai rumus metode komposit Simpson.
 
 \begin{equation*}
 	\begin{split}
@@ -197,8 +197,41 @@ Fungsi tersebut diimplementasikan ke dalam Octave untuk digunakan nantinya dalam
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
-function ret = zNormalDist(z)
-	ret = (1/sqrt(2.*pi)).*exp((-z.^2)/2);
+function res = z_norm_dist(z)
+	res = (1/sqrt(2.*pi)).*exp((-z.^2)/2);
+endfunction
+	\end{lstlisting}
+\end{center}
+
+Perlu diingat bahwa metode Simpson didasari oleh interpolasi pada tiga titik, yaitu \emph{a}, \(\mathrm{h=\frac{(a+b)}{2}}\) (\emph{midpoint} atau \emph{halfpoint}), dan \emph{b}.
+
+Dengan menggunakan pendekatan melalui fungsi berikut:
+
+\begin{equation*}
+	\begin{split}
+		\int_{a}^{b}f(x)dx=\frac{h}{3}\sum_{i=1}^{n/2}\left \{ f(x_{i-1})+4f(x_{i})+f(x_{i+1}) \right \}
+	\end{split}
+\end{equation*}
+
+Kodenya:
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+function [res, n] = composite_simpson(a,b,tol,f)
+
+	n = ceil((b-a)/tol^(1/4));
+	h = (b-a)/n;
+	res = f(a)+f(b);
+	 
+	# Make sure n is even
+	n = n+mod(n,2);
+	 
+	for i = 1:n/2
+	  res = res + 4*f(a + h*(2*i-1)) + 2*f(a+h*2*i);
+	endfor
+	 
+	res = res * h / 3;
+	 
 endfunction
 	\end{lstlisting}
 \end{center}
@@ -244,7 +277,7 @@ Penulis akan menggunakan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} yan
 
 \subsection{Implementasi Menggunakan Octave}
 
-Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, penulis dapat menyusun sebuah algoritma pada MATLAb/Octave yaitu fungsi \emph{TrapezoidAdaptive} yang merupakan fungsi untuk pemanggilan rekursif setiap kali terjadinya pemecahan interval karena pendekatan yang masih belum mencapai batas kriteria TOL. Disusun sebagai berikut:
+Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, penulis dapat menyusun sebuah algoritma pada MATLAB/Octave yaitu fungsi \emph{TrapezoidAdaptive} yang merupakan fungsi untuk pemanggilan rekursif setiap kali terjadinya pemecahan interval karena pendekatan yang masih belum mencapai batas kriteria TOL. Disusun sebagai berikut:
 \begin{center}
 	\begin{lstlisting}[language=Octave]
 		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
