@@ -186,6 +186,23 @@ Tujuan dari penelitian ini adalah untuk membuktikan aproksimasi nilai integral p
 
 \subsection{Implementasi Menggunakan Octave}
 
+\par Fungsi yang diberikan pada tugas ini adalah fungsi distribusi normal tabel Z sebagai berikut.
+\begin{equation*}
+	\begin{split}
+		P(Z \le z ) & = \phi(z) = \int_{-\infty}^{z} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
+	\end{split}
+\end{equation*}
+
+Fungsi tersebut diimplementasikan ke dalam Octave untuk digunakan nantinya dalam metode komposit Simpson.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+function ret = zNormalDist(z)
+	ret = (1/sqrt(2.*pi)).*exp((-z.^2)/2);
+endfunction
+	\end{lstlisting}
+\end{center}
+
 \subsection{Analisis Hasil Komputasi pada Octave}
 
 \subsection{Toleransi Error}
