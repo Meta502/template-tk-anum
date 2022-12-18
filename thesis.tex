@@ -186,7 +186,7 @@ endfunction
 	\end{lstlisting}
 \end{center}
 
-Jika diperhatikan, fungsi ini memang hanya merupakan translasi dari rumus yang sudah diberikan. Perbedaannya, pada implementasi ini, tabel Romberg sudah didefinisikan dengan ukuran \(R(100,100)\). Hal ini merupakan asumsi di mana hasil komputasi tidak akan mencapai baris dan kolom ke-100 karena sifat Romberg yang menggunakan ekstrapolasi untuk mencari nilai paling akurat, sehingga seharusnya, berdasarkan asumsi, tidak akan memakan komputasi sebanyak itu.
+Jika diperhatikan, fungsi ini memang hanya merupakan translasi dari rumus yang sudah diberikan. Perbedaannya, pada implementasi ini, tabel Romberg sudah didefinisikan dengan ukuran \(R(100,100)\). Hal ini dilakukan berdasarkan asumsi di mana hasil komputasi tidak akan mencapai baris dan kolom ke-100 karena sifat Romberg yang menggunakan ekstrapolasi untuk mencari nilai paling akurat, sehingga seharusnya, berdasarkan asumsi, tidak akan memakan komputasi sebanyak itu.
 
 Selain itu, diberikan juga \emph{guard} berupa batas toleransi maksimum dari perhitungan. Di awal, diberikan batas toleransi berupa \lstinline{tol < 1e-14} yang berarti toleransi maksimum diperbolehkan hanya mencapai \lstinline{1e-13}. Hal ini dikarenakan fungsi referensi untuk perhitungan integral dari Octave yang akan digunakan pada laporan ini, yaitu \emph{quadgk}, memiliki batas toleransi mencapai \lstinline{1e-14} sebagai nilai terendah dari hasil percobaan kami.
 
@@ -198,7 +198,7 @@ Dengan demikian, fungsi tersebut akan menerima beberapa input berupa batas bawah
 
 \subsubsection{Hasil Komputasi pada Octave}
 
-Untuk melihat hasil implementasi, akan digunakan input dengan spesifikasi berikut
+Untuk menentukan hasil implementasi, akan digunakan input dengan spesifikasi berikut
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
@@ -215,7 +215,7 @@ printf("\nTolerance Limit: %d\n\n", tol)
 	\end{lstlisting}
 \end{center}
 
-Jika dilihat, nilai minInf akan menggunakan \lstinline{1e-3}. Hal ini dikarenakan penggunaan nilai yang lebih kecil akan memakan komputasi lebih lama karena implementasi yang dilakukan akan menghitung dari nilai bawah yang sangat kecil tersebut. Selain itu, hasil komputasi fungsi distribusi normal di atas akan memiliki nilai yang sangat kecil untuk \(x \le 100\) sehingga akan menjadi redundan dan perbedaan akan tidak terlalu signifikan. Hal ini akan ditunjukkan pada contoh eksekusi implementasi kode di bawah.
+Jika dilihat, nilai \lstinline{minInf} akan menggunakan \lstinline{1e-3}. Hal ini dikarenakan penggunaan nilai yang lebih kecil akan memakan komputasi lebih lama karena implementasi yang dilakukan akan menghitung dari nilai bawah yang sangat kecil tersebut. Selain itu, hasil komputasi fungsi distribusi normal di atas akan memiliki nilai yang sangat kecil untuk \(x \le -100\) sehingga akan menjadi \emph{redundant} dan perbedaan akan tidak terlalu signifikan. Hal ini akan ditunjukkan pada contoh eksekusi implementasi kode di bawah.
 
 Lalu, fungsi integrasi Romberg akan dipanggil dua kali untuk melihat 2 cara dari 2 pemanggilan/komputasi berbeda untuk distribusi normal. Sebelumnya, perlu diketahui bahwa fungsi distribusi normal bisa dihitung dengan dua cara. Misalkan kita ingin memanggil untuk suatu interval \(P(a \le Z \le b)\). Maka, bisa didefinisikan sebagai
 
@@ -226,7 +226,7 @@ Lalu, fungsi integrasi Romberg akan dipanggil dua kali untuk melihat 2 cara dari
 	\end{split}
 \end{equation*}
 
-Dengan demikian, dapat diimplementasikan pada Octave kedua pemanggilan tersebut
+Dengan demikian, dapat diimplementasikan pada Octave untuk kedua pemanggilan tersebut
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
@@ -249,7 +249,7 @@ ansMinInf = abs(res2-res1)
 	\end{lstlisting}
 \end{center}
 
-Dengan \lstinline{R(1:j,1:j)} adalah tabel Romberg dan \lstinline{res} adalah hasil komputasi untuk pemanggilan \(rombergIntegration\). Untuk memperoleh hasil melalui cara \(P(Z \le b ) - P(Z \le a )\), maka akan dikeluarkan melalui pengurangan dan variabel \lstinline{ansMinInf}. Untuk kasus dengan spesifikasi di atas, akan menghasilkan \emph{output}
+Dengan \lstinline{R(1:j,1:j)} adalah tabel Romberg dan \lstinline{res} adalah hasil komputasi untuk pemanggilan \(rombergIntegration\). Untuk memperoleh hasil melalui cara \(P(Z \le b ) - P(Z \le a )\), maka akan dikomputasi melalui pengurangan dan variabel \lstinline{ansMinInf}. Untuk kasus dengan spesifikasi di atas, akan menghasilkan \emph{output}
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
@@ -311,7 +311,7 @@ diff = 2.522870801158206e-12
 Dapat dilihat bahwa perbedaannya sangat kecil, dengan tingkat perbedaan pada angka \lstinline{1e-12} sehingga bisa dibilang keduanya memiliki perbedaan yang insiginifikan dan salah satu dari kedua implementasi bisa digunakan. Tetapi, perlu diketahui bahwa metode \(P(Z \le b ) - P(Z \le a )\) akan memakan waktu komputasi lebih lama karena harus menghitung dari batas bawah \lstinline{-inf}, yang pada implementasi ini berupa \lstinline{-1e3} sehingga memakan \emph{resource} yang lebih besar. Maka, jika kita ingin menghitung pada interval \([a,b]\), lebih baik menggunakan implementasi \(P(a \le Z \le b)\).
 
 \subsection{Toleransi Error}
-Seperti yang diimplementasikan di atas, fungsi Romberg akan mengalami konvergensi pada setiap diagonal hingga mencapai nilai hasil integrasi yang paling akurat. Hal ini terjadi karena adanya iterasi \emph{composite trapezoidal rule} dan \emph{richardson's extrapolation}. Untuk lebih memahami bagaimana iterasi trapezoid dan ekstrapolasi ini meningkatkan akurasi, perlu dilihat analisis berdasarkan \emph{order of accuracy}.
+Seperti yang diimplementasikan di atas, fungsi Romberg akan mengalami konvergensi pada setiap diagonal hingga mencapai nilai hasil integrasi yang paling akurat. Hal ini terjadi karena adanya iterasi \emph{composite trapezoidal rule} dan \emph{richardson's extrapolation}. Untuk lebih memahami bagaimana iterasi trapezoid dan ekstrapolasi ini meningkatkan akurasi, perlu dilihat analisis berdasarkan \emph{order of accuracy}. Pembahasan toleransi eror akan menggunakan sumber referensi dari \cite{jim_lamber}.
 
 Pertama-tama, kita perlu mengetahui bentuk umum dari \emph{composite trapezoidal rule}, yaitu
 \begin{equation*}
@@ -330,7 +330,7 @@ Jika kita nyatakan \(I(f)\) sebagai hasil komputasi integrasi, maka pada tabel R
 	\end{split}
 \end{equation*}
 
-Dari sini kita bisa lihat bahwa \emph{composite trapezoidal rule} mencapai batas akurasi paling tinggi berupa \(O(^4)\), yang artinya akurasi hanya mencapai derajat 4 atau \(10^-4\).
+Dari sini kita bisa lihat bahwa \emph{composite trapezoidal rule} mencapai batas akurasi paling tinggi berupa \(O(h^4)\), yang artinya akurasi hanya mencapai derajat 4 atau \(10^{-4}\).
 Sekarang kita akan melanjutkan iterasi dan komputasi aproksimasi \(T_{2,2}, T_{3,1}, T_{3,2}\) menggunakan \emph{composite trapezoidal rule} untuk baris, lalu untuk kolom akan digunakan \emph{richardson's extrapolation}. Maka, akan diperoleh
 \begin{equation*}
 	\begin{split}
@@ -339,16 +339,16 @@ Sekarang kita akan melanjutkan iterasi dan komputasi aproksimasi \(T_{2,2}, T_{3
 	\end{split}
 \end{equation*}
 
-Dapat dilihat bahwa akurasi meningkat hingga \(O(^6)\), yang artinya akurasi hanya mencapai derajat 6 atau \(10^-6\). Hal ini disebabkan oleh adanya ekstrapolasi yang meningkatkan akurasi dengan pertumbuhan akurasi \(O(h^{2k+2})\) dengan \(k\) adalah kolom ke-\(k\). Dengan demikian, semakin banyak iterasi, eror akan semakin besar, dengan akurasi terbaik berada pada elemen diagonal akibat pertumbuhan akurasi akibat ekstrapolasi.
+Dapat dilihat bahwa akurasi meningkat hingga \(O(h^6)\), yang artinya akurasi mencapai derajat 6 atau \(10^{-6}\). Hal ini disebabkan oleh adanya ekstrapolasi yang meningkatkan akurasi dengan pertumbuhan akurasi \(O(h^{2k+2})\) dengan \(k\) adalah kolom ke-\(k\). Dengan demikian, semakin banyak iterasi, eror akan semakin besar, dengan akurasi terbaik berada pada elemen diagonal akibat pertumbuhan akurasi akibat ekstrapolasi.
 Selain itu, karena akurasi semakin meningkat dan eror semakin kecil, maka dengan setiap iterasi, nilai akan semakin mendekati hasil eksak dan akan terjadi fenomena konvergensi dengan perbedaan antar nilai, terutama pada diagonal, semakin kecil.
 
 Dengan premis ini, algoritma Romberg yang diimplementasikan akan memanfaatkan peningkatan akur\hyp{}asi dan juga sifat konvergensi untuk menentukan kapan algoritma berhenti sesuai dengan toleransi eror. Implementasi ini dilakukan melalui \lstinline{if abs(R(j,j)-R(j-1,j-1)) < tol} yang menghitung perbedaan elemen diagonal \(|R(n,n)-R(n-1,n-1)| < tol\) di mana jika perbedaan sudah lebih kecil daripada toleransi, maka akan berhenti.
 Hal ini menjamin nilai yang diperoleh akan memiliki akurasi di bawah batas toleransi yang diberikan karena nilai yang berbeda dan masih dalam proses konvergensi berada di luar batas, sementara nilai yang masuk batas toleransi sudah dijamin konvergen dan merupakan nilai akhir hasil komputasi.
 
-Berdasarkan contoh eksekusi pada bagian sebelumnya, kita bisa membuktikan hasil implementasi kita dengan membandingkan hasilnya dengan hasil komputasi integrasi aktual dari fungsi bawaan Octave.
+Berdasarkan contoh eksekusi pada bagian sebelumnya, kita bisa membuktikan hasil implementasi kita melalui perbandingan hasil dengan hasil komputasi integrasi aktual dari fungsi bawaan Octave.
 
 Fungsi pertama yang akan diuji adalah menggunakan fungsi \lstinline{quadgk}, yaitu fungsi integrasi dari Octave menggunakan algoritma \emph{adaptive Gauss-Konrod quadrature}. Menurut Octave, \lstinline{quadgk}, memiliki karakteristik \emph{Medium accuracy (1e-6 - 1e-9) with smooth integrands. Handles oscillatory functions and infinite bounds}, dan memiliki tingkat akurasi yang lebih baik daripada fungsi integrasi satu variabel lain seperti \lstinline{quad, quadv, dan quadl} yang menjadi alasan kami menggunakan fungsi ini sebagai referensi.
-perbandingan ini diimplementasikan sebagai berikut
+Perbandingan ini diimplementasikan sebagai berikut
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
@@ -469,7 +469,8 @@ for j = 2:n
 endfor
 	\end{lstlisting}
 \end{center}
-Pada bagian ini, di luar \lstinline{for loop} di dalam, terdapat 11 FLOPs, yaitu pada komputasi \lstinline{h}, menghitung \lstinline{R(j,1)} dan mengecek batas toleransi, yang dijumlahkan menghasilkan kompleksitas FLOPs \(O(n)\)
+
+\par Pada bagian ini, di luar \lstinline{for loop} di dalam, terdapat 11 FLOPs, yaitu pada komputasi \lstinline{h}, menghitung \\ \lstinline{R(j,1)} dan mengecek batas toleransi, yang dijumlahkan menghasilkan kompleksitas FLOPs \(O(n)\)
 Lalu, pada \lstinline{for loop} di dalam, terdapat 2 \lstinline{for loop} berbeda. Yang pertama, terdapat 5 FLOPs yang melakukan iterasi hingga \(2^{j-1}\) sehingga memiliki kompleksitas \(O(n*\log_2 j)\).
 Untuk yang kedua, terdapat 11 FLOPs untuk iterasi sampai j dalam menghitung \lstinline{R(j,k)}, sehingga menghasilkan kompleksitas \(O(n*j)\). Dengan mengambil suku terbesar, maka kompleksitas dalam segi FLOPs untuk integrasi Romberg adalah \(O(n*j + n*\log_2 j)\).
 
@@ -478,7 +479,7 @@ Lalu, pada \emph{nested loop} terdapat 1 \emph{function call} untuk iterasi \lst
 
 Jika dilihat, kompleksitas implementasi Romberg bergantung pada \lstinline{j} dan \lstinline{n}, dengan \lstinline{j} bergantung pada \lstinline{n} karena tabel Romberg membentuk sebuah \emph{lower trianglular matrix}. Nilai \lstinline{n} ini merepresentasikan jumlah baris yang ada dan digunakan pada tabel/matriks Romberg, dengan implementasi di atas memiliki batas maksimum \lstinline{n = 100}.
 Masalah yang dihadapi adalah menentukan jumlah \lstinline{n} yang eksak, karena algoritma Romberg berkembang secara dinamis tergantung pada fungsi dan toleransi, seperti yang dijelaskan pada bagian sebelumnya. Tetapi, aproksimasi dan tebakan kasar bisa dibentuk berdasarkan batas toleransi yang diberikan. Aproksimasi ini menggunakan teori yang disebutkan pada bagian sebelumnya, yaitu pertumbuhan akurasi \(O(h^{2k+2})\) dengan \(k\) adalah kolom ke-\(k\).
-Jika kita memberikan suatu batas toleransi derajat-y atau \(10^y\), maka kita bisa aproksimasi tabel yang dihasilkan akan berukuran \(O(h^{2k+2 = y})\) atau \(O(h^{k=\frac{y-2}{2}})\) dengan \(k\) adalah \(n\).
+Jika kita memberikan suatu batas toleransi derajat-y atau \(10^{-y}\), maka kita bisa aproksimasi tabel yang dihasilkan akan berukuran \(O(h^{2k+2 = y})\) atau \(O(h^{k=\frac{y-2}{2}})\) dengan \(k\) adalah \(n\).
 Sebuah percobaan dilakukan dengan premis ini. Menggunakan spesifikasi di awal, maka dibentuk grafik yang memetakan dari berbagai batas toleransi sehingga menghasilkan hasil berikut.
 
 \begin{figure}[h]
@@ -487,7 +488,7 @@ Sebuah percobaan dilakukan dengan premis ini. Menggunakan spesifikasi di awal, m
 	\caption{Grafik Pertumbuhan Ukuran Tabel Romberg}
 	\label{fig:rombergTableGraph}
 \end{figure}
-Dari hasil percobaan, ditemukan bahwa aproksimasi kasar tidak terlalu benar, tetapi hal yang jelas adalah tabel Romberg tumbuh secara fluktuatif tetapi sebanding mengikuti batas toleransi yang diberikan yang semakin kecil (artinya \emph{demand} akurasi meningkat dan perlu komputasi lebih intens yang mengakibatkan tabel Romberg semakin besar).
+Dari hasil percobaan, ditemukan bahwa aproksimasi kasar tidak terlalu benar, namun hal yang jelas adalah tabel Romberg tumbuh secara fluktuatif tetapi sebanding mengikuti batas toleransi yang diberikan yang semakin kecil (artinya \emph{demand} akurasi meningkat dan perlu komputasi lebih intens yang mengakibatkan tabel Romberg semakin besar).
 Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang diberikan, seperti yang disebutkan pada bagian sebelumnya di mana tipe fungsi yang digunakan akan memengaruhi akurasi dan seberapa banyak komputasi yang perlu dilakukan.
 Maka dari itu, bisa disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n*j + n*\log_2 j)\) dan untuk \emph{function call} adalah \(O(n*\log_2 j)\) dengan \(n\) adalah ukuran tabel Romberg yang bergantung pada fungsi dan batas toleransi serta nilai masukan, dan \(j\) bergantung pada \(n\).
 
