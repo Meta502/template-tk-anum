@@ -72,27 +72,9 @@ Solusi Adaptive Quadrature menggunakan ekstraploasi dengan melalui pendekatan de
 \includegraphics[scale=0.4, center]{adapt.jpg}
 Untuk setiap pencarian kriterianya, akan didapatkan S[a,c]+S[c,b] dengan a<c<b pada interval [a,b] yang mengaproksimasi S[a,b]. Pengecekan dapat dilakukan antara S[a,b]-(S[a,c]+S[c,b]) hingga memenuhi kriteria 3*TOL.
 
+(belum nambahin adaptive teori)
+
 3. \emph{Romberg Method}
-
-Dalam paper ini, penulis diberikan sebuah fungsi probabilitas suatu variabel acak Z dengan distribusi normal kurang dari \emph{z} dengan fungsi integral berikut
-
-\includegraphics[scale=0.6, center]{func2.jpg}
-
-Tujuan dari penelitian ini adalah untuk membuktikan aproksimasi nilai integral pada interval \([a, b]\) dengan ketiga metode di atas untuk menghitung probabilitas P(a kecil Z kecil B) memiliki error (perbandingan dengan nilai aktual) kurang dari \emph{TOL} yang diberikan.
-
-\section{Implementasi Metode Composite Simpson}
-
-\section{Implementasi Metode Adaptive Method}
-Perhitungan probabilitas yang diminta adalah untuk nilai P(a<=Z<=b), sedangkan fungsi yang tersedia adalah P(Z<=z). Nilai P(a<=Z<=b) dapat diubah menyesuaikan bentuk persamaan di atas dengan cara sebagai berikut:
-P(a<=Z<=b) = F(b) - F(a)
-Berdasarkan PDF, F(x) =
-
-
-\section{Implementasi Metode Romberg}
-
-Pada paper ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline} - atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural} - untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). Cubic spline dapat didefinisikan sebagai suatu \emph{piecewise polyomial function} yang menginterpolasi sebuah titik
-\section{Metode Integrasi Romberg}
-\subsection{Pengenalan Algoritma Romberg}
 \emph{Romberg Integration} merupakan metode integrasi yang menggunakan prinsip \emph{composite trapezoidal rule} dan meningkatkan akurasi dengan melakukan ekstrapolasi melalui \emph{Richardson's Extrapolation}.
 
 \emph{Romberg} bekerja dengan menggunakan \emph{composite trapezoidal rule} sebagai basis dari perhitungan dan melakukan iterasi dengan melakukan pembagian interval untuk meningkatkan akurasi. Basis ini diiterasi per-baris pada suatu tabel Romberg yang memiliki ukuran \(R(n,n)\) melalui rumus
@@ -147,6 +129,285 @@ Maka dari itu, untuk memperoleh hasil integrasi, diambil elemen diagonal pada ba
 		\int_{a}^{b} f(x) \,dx & = R(j,j)
 	\end{split}
 \end{equation*}
+
+
+Dalam paper ini, penulis diberikan sebuah fungsi probabilitas suatu variabel acak Z dengan distribusi normal kurang dari \emph{z} dengan fungsi integral berikut
+
+\includegraphics[scale=0.6, center]{func2.jpg}
+
+Tujuan dari penelitian ini adalah untuk membuktikan aproksimasi nilai integral pada interval \([a, b]\) dengan ketiga metode di atas untuk menghitung probabilitas P(a kecil Z kecil B) memiliki error (perbandingan dengan nilai aktual) kurang dari \emph{TOL} yang diberikan.
+
+\section{Implementasi Metode Composite Simpson}
+
+\section{Implementasi Adaptive Method}
+\par Fungsi yang diberikan pada distribusi normal pada persoalan tertulis sebagai berikut:
+\begin{equation*}
+	\begin{split}
+		P(Z \le z ) & = \phi(z) = \int_{-\infty}^{z} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
+	\end{split}
+\end{equation*}
+
+\par Demikian pada pengerjaan pada paper ini digunakan fungsi MATLAB/Octave, sehingga fungsi distribusi normal di persoalan dapat dituliskan:
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+function res = func(z)
+	res = (1/sqrt(2.*pi)).*exp((-z.^2)/2);
+endfunction
+	\end{lstlisting}
+\end{center}
+
+Probabilitas yang diminta untuk diselesaikan adalah
+\begin{equation*}
+	\begin{split}
+		P(a \le Z \le b )  = \phi(a,b) & = \int_{a}^{b} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
+	\end{split}
+\end{equation*}
+Dengan begitu kita dapat melakukan translasi bentuk menyesuaikan dengan fungsi distribusi normal yang diberikan pada persoalan sebelumnya sebagai berikut:
+\begin{equation*}
+	\begin{split}
+		P(Z \le b ) - P(Z \le a )  = \phi(b)-\phi(a) & =  \int_{-\infty}^{b} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} - \int_{-\infty}^{a} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
+	\end{split}
+\end{equation*}.
+
+Dari bentuk di atas maka akan dilakukan dua buah pemanggilan pendekatan integral yang berbeda dengan interval \([-\infty, a]\) dan interval \([-\infty, b]\). Sehingga nilai aproksimasi nilai integral keseluruhan adalah selisih dari pendekatan integrasi kedua interval tersebut.
+Penulis akan menggunakan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} yang mana memiliki rumus sebagai berikut:
+
+\subsubsection{Implementasi Menggunakan Octave}
+
+Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, penulis dapat menyusun sebuah algoritma pada MATLAb/Octave yaitu fungsi \emph{TrapezoidAdaptive} yang merupakan fungsi untuk pemanggilan rekursif setiap kali terjadinya pemecahan interval karena pendekatan yang masih belum mencapai batas kriteria TOL. Disusun sebagai berikut:
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
+		c = (a+b)/2;      % evaluate f in midpoint
+		fa = f(a); fb = f(b); fc = f(c);
+	  
+		Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
+		Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
+		Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
+	  
+		if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
+		  Q = Q2+Q3;   %accept trapezoid rule value
+		else
+		  Q = TrapezoidAdaptive(f, a,c, Tol/2, ori) + TrapezoidAdaptive(f,c,b, Tol/2, ori); % use algorithm for [a,c] and [c,b]
+		end
+	  end
+	\end{lstlisting}
+\end{center}
+
+\subsubsection{Analisis Hasil Komputasi pada Octave}
+
+Untuk melihat hasil implementasi, akan digunakan input dengan spesifikasi berikut
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		minInf = -1e4;
+		a = input('Masukkan batas bawah interval a:  ');
+		b = input('Masukkan batas atas interval b:  ');
+		TOL = input('Masukkan Tolerance TOL:  ');
+
+		orig = b-a;
+		printf("\nP(Z <= a)\n")
+		Pa = TrapezoidAdaptive(@func,minInf,a,TOL,orig)
+
+		printf("\nP(Z <= b)\n")
+		Pb = TrapezoidAdaptive(@func,minInf,b,TOL,orig)
+
+		approx = Pb-Pa
+		printf("\nHasil Aproksimasi Integrasi: %d\n", approx)
+	\end{lstlisting}
+\end{center}
+
+Pada fungsi pengerjaan yang dibangun di atas, penulis menggunakan asumsi untuk penggunaan bilangan \(-\infty\) disubstitusikan dengan bilangan yang sangat kecil dalam fungsi di atas atau digunakan nilai \lstinline{1e-4} pada variabel minInf. Dikarenakan Adaptive Method merupakan fungsi rekursi, maka dengan batas bawah \(-\infty\) atau dengan bilangan yang lebih kecil dari \lstinline{1e-4} akan menimbulkan error max depth recursion.
+Seperti apa yang sudah dirumuskan pada bagian sebelumnya, akan dilakukan dua buah pemanggilan dengan interval yang berbeda yang nilai aproksimasi masing-masing interval akan disimpan pada variabel \(Pa\) dan \(Pb\). Hasil integrasi yang memenuhi persamaan \(P(a \le Z \le b)\) adalah dengan hasil selisih kedua pendekatan di atas \(P(Z \le b ) - P(Z \le a )\).
+
+Untuk kasus dengan spesifikasi input batas bawah \emph{a = -1} dan batas atas \emph{b = 1.0} akan menghasilkan \emph{output} dengan dua kali pemanggilan fungsi dengan interval berbeda sebagai berikut:
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		Masukkan batas bawah interval a:  -1
+		Masukkan batas atas interval b:  1
+		Masukkan Tolerance TOL:  0.0001
+
+		P(Z <= a)
+		Pa = 0.158655267050648
+
+		P(Z <= b)
+		Pb = 0.841344747955897
+		approx = 0.682689480905249
+
+		Hasil Aproksimasi Integrasi: 0.682689480905249
+
+	\end{lstlisting}
+\end{center}
+
+Hal ini dapat dibandingkan dengan pemanggilan fungsi secara langsung untuk perhitungan integrasi pemanggilan \(P(a \le Z \le b)\), dilakukan komputasi dan hasil sebagai berikut:
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		integ = TrapezoidAdaptive(@func,a,b,TOL,orig);
+		printf("\nHasil Aproksimasi Integral P(a<=Z<=b): %d\n", integ)
+
+		Hasil Aproksimasi Integral P(a<=Z<=b): 0.682689173963903
+	\end{lstlisting}
+\end{center}
+
+Hasil percobaan di atas antara pemanggilan fungsi dengan integrasi pemanggilan \(P(a \le Z \le b)\) dengan \(P(Z \le b ) - P(Z \le a )\) memiliki hasil yang demikian serupa yakni dengan hasil \(P(a \le Z \le b)= 0.682689480905249\)  dan \(P(Z \le b ) - P(Z \le a ) = 0.682689480905249\). Perbandingan eror kedua hasil integrasi adalah sebagai berikut:
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+	printf("\nBeda Hasil Komputasi P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)\n")
+	diff_res = approx - integ
+
+	Beda Hasil Komputasi P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)
+	diff_res = 3.069413463396842e-07
+	\end{lstlisting}
+\end{center}
+
+Dengan tingkat perbedaan pada angka \lstinline{1e-07}, penulis dapat mengatakan kedua implementasi dapat digunakan dan memiliki hasil perhitungan yang demikian sama. Yang menjadi pembeda antara kedua cara komputasi di atas adalah waktu komputasi untuk pemanggilan pendekatan satu integrasi dengan interval \([a,b]\) dan dengan interval \([-\infty,b] dan [-\infty,b]\) yang menggunakan dua pemanggilan integral. Maka pengerjaan \(P(Z \le b ) - P(Z \le a )\) memiliki waktu komputasi lebih lama karena selain mengeksekusi dua integrasi juga integrasi yang dieksekusi menghitung dari batas bawah \(-\infty\) atau dalam komputasi di atas adalah \lstinline{1e-4}.
+
+\subsection{Toleransi Error}
+
+\emph{Adaptive Method} dengan aturan Trapezoid dan aturan titik tengah akan mengatur pembagian subinterval menyesuaikan fungsi yang diintegrasi pada interval tertentu dan kebutuhan akurasi. Karena dilakukan untuk setiap subinterval, eror global tidak diketahui dan dibutuhkan pendekatan eror yang diketahui bahwa kita dapat mengatur nilai eror adalah
+
+\begin{equation*}
+	\begin{split}
+		E  = \frac{T(f) - M(f)}{3}
+	\end{split}
+\end{equation*}
+
+Adapun diketahui bentuk dari \emph{composite trapezoidal rule}, yaitu:
+\begin{equation*}
+	\begin{split}
+		\int_{a}^{b} f(x) \,dx & = \frac{h}{2}[y_0+y_m+2\sum_{j=1}^{m-1}f(y_i)]-\frac{(b-a)h^2}{12}f^(2)(c)
+	\end{split}
+\end{equation*}
+
+Dari sini kita bisa lihat bahwa \emph{trapezoidal rule} mencapai batas akurasi paling tinggi berupa \(O(^2)\). Dengan jika komputasi batas E terlalu besar dan tidak mencapai kriteria, maka interval dapat dipecah dari \([a,b]\) menjadi \([a,c]\) dan \([c,b]\) dengan \emph{c} adalah nilai tengah kedua batas integral.
+Operasi interasi tersebut akan diulangi hingga besar E memenuhi batas yag dikehendaki.
+Dengan begitu kombinasi aturan eror pada dua tingkat metode trapezoid untuk \emph{Adaptive Method} adalah sebagai berikut:
+
+\begin{equation*}
+	\begin{split}
+		T_{h}(f) & = I(f) + O(h^2) \\
+		T_{h/2}(f) & = I(f) + \frac{1}{4}O(h^2)
+	\end{split}
+\end{equation*}
+
+(tolong bantuin gua toleransi error aijfhijdiadj)
+
+
+
+Pembuktian melalui eksekusi percobaan pada bagian sebelumnya, penulis membandingkan hasil aproksimasi dengan pendekatan metode Adaptive dengan nilai aktual integrasi melalui beberapa fungsi bawaan Octave dan metode pencocokan dengan nilai probabilitas tabel-Z yang sesungguhnya.
+
+1. Percobaan dengan fungsi \lstinline{quadgk}, yang merupakan fungsi integrasi Octave dengan algoritma \emph{adaptive Gauss-Konrod quadrature}.\lstinline{Quadgk} tergolong ke dalam fungsi yang memiliki \emph{Medium accuracy (1e-6 - 1e-9) with smooth integrands}. Fungsi ini menangani fungsi yang osilasi dan dengan batas integrasi tak hingga seperti pada persoalan di atas. Implementasi perbandingan hasil integrasi aproksimasi interval \([-1,1]\) pengerjaan dan \lstinline{quadgk} adalah sebagai berikut:
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		[quadAns, err] = quadgk(@func, a, b)
+		err_quad = abs(quadAns-approx);
+		err_quad_ab = abs(quadAns-integ);
+		printf("----------")
+		printf("\nHasil Aktual dengan Metode Quadgk: %d\n", quadAns)
+		printf("\nEror P(Z <= b) - P(Z <= a)  Vs. Metode Quadgk: %d\n", err_quad)
+		printf("\nEror P(a <= Z <= b) Vs. Metode Quadgk: %d\n", err_quad_ab)
+	\end{lstlisting}
+\end{center}
+
+dengan hasil sebagai berikut
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		Hasil Aktual dengan Metode Quadgk: 
+		quadAns = 0.682689492137086
+		err = 4.795122632295090e-14  
+
+		Eror P(Z <= b) - P(Z <= a)  Vs. Metode Quadgk: 1.123183701601249e-08
+		Eror P(a <= Z <= b) Vs. Metode Quadgk: 3.181731833556967e-07
+	\end{lstlisting}
+\end{center}
+
+\lstinline{Quadgk} memiliki akurasi dan error \lstinline{1e-14} yang terbilang cukup akurat dan memiliki perbedaan akurasi dengan hasil aproksimasi sebanyak \lstinline{1e-7} dan \lstinline{1e-8}. Hal ini membuktikan aproksimasi dengan metode Adaptive yang menerapkan aturan Trapezoid masih memiliki perbedaan akurasi yang lumayan, tetapi tidak dapat dikatakan buruk. Hal ini juga bergantung pada nilai besar TOL yang ditentukan.
+
+
+2. Percobaan dengan fungsi \lstinline{normcdf} yang merupakan suatu fungsi distribusi normal. Dengan begitu membandingkan hasil aproksimasi metode ini dengan \lstinline{normcdf} akan dirasa lebih akurat dengan membandingkannya pada fungsi distribusi normal langsung.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		cdf = normcdf([a b]);
+		cdf_ans = cdf(2) - cdf(1);
+		err_cdf = abs(cdf - approx);
+		err_cdf_ab = abs(cdf - integ);
+
+		printf("----------")
+		printf("\nHasil NormCDF for Z value (Actual Value)\n: %d", cdf_ans)
+		printf("\nEror P(Z <= b) - P(Z <= a)  Vs. Metode NormCDF: %d\n", err_cdf)
+		printf("\nEror P(a <= Z <= b) Vs. Metode NormCDF: %d\n", err_cdf_ab)
+	\end{lstlisting}
+\end{center}
+
+dengan hasil sebagai berikut
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		Hasil NormCDF for Z value (Actual Value): 0.682689492137086
+		Eror P(Z <= b) - P(Z <= a)  Vs. Metode NormCDF: 1.123183690499019e-08
+		Eror P(a <= Z <= b) Vs. Metode NormCDF: 3.181731832446744e-07
+	\end{lstlisting}
+\end{center}
+
+Keluaran perbandingan nilai aproksimasi integrasi percobaan ini dengan fungsi \lstinline{quadgk} dan \lstinline{normcdf} memiliki besar perbedaan nilai
+yang hampir serupa di atas yaitu untuk \(P(a \le Z \le b)= 1.123183690499019e-08\)  dan \(P(Z \le b ) - P(Z \le a ) = 3.181731832446744e-07\).
+Dengan begitu dapat dikatakan fungsi aproksimasi dengan metode
+Adaptive Trapezoid ini sudah cukup akurat menyesuaikan dengan fungsi bawaan Octave yaitu \lstinline{quadgk} dan utamanya \lstinline{normcdf} yang merupakan fungsi distribusi normal.
+
+Percobaan di atas jika dijalankan dengan serangkaian TOL yang berbeda juga akan menghasilkan hasil error pembanding dengan \lstinline{quadgk} dan \lstinline{normcdf} di atas, digambarkan pada grafik di bawah.
+(Percobaan dengan interval \([0,0.01]\))
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{trapezoid graf.jpg}
+	\caption{Grafik Nilai Eror Hasil Komputasi Adaptive dengan fungsi bawaan (quadgk dan normcdf)}
+	\label{fig:difGraphAdaptive}
+\end{figure}
+
+Dengan begitu percobaan aproksimasi metode Adaptive dengan aturan Trapezoid mengeluarkan hasil yang sesuai dan memiliki akurasi yang sesuai serta menyesuaikan dengan TOL eror yang diberikan. Hasil komputasi juga sesuai atau mendekati dengan fungsi distribusi normal dan hasil integrasi aktual fungsi bawaan.
+
+\subsection{Analisis Kompleksitas}
+Berikut dilakukan perhitungan FLOP (\emph{floating-point operatons}) pada implementasi kode.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+if tol < 1e-14
+	printf("Tolerance is too small and will produce errors, please use larger values\n")
+	res = 0;
+	return;
+endif
+
+n = 100;
+R = zeros(n, n);
+R(1,1) = (b-a)*(f(a)+f(b))/2;
+	\end{lstlisting}
+\end{center}
+
+Di sini, terdapat 5 FLOPs yang terjadi, yaitu pada kondisi toleransi, dan inisiasi elemen pertama \\ \lstinline{R(1,1)}. Lanjut analisis ke dalam \emph{loop}
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
+			c = (a+b)/2;      % evaluate f in midpoint
+			fa = f(a); fb = f(b); fc = f(c);
+
+			Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
+			Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
+			Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
+
+			if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
+				Q = Q2+Q3;   %accept trapezoid rule value
+			else
+				Q = TrapezoidAdaptive(f,a,c,Tol/2,ori) + TrapezoidAdaptive(f,c,b,Tol/2,ori);
+				% use algorithm for [a,c] and [c,b]
+			end
+		end
+	\end{lstlisting}
+\end{center}
+
+(belum analisis kompleksitas algoritma)
 
 \subsection{Implementasi Algoritma Romberg}
 
@@ -452,6 +713,72 @@ Nilai eror yang diperoleh juga bisa diatur melalui batas toleransi, dengan semak
 \end{figure}
 
 Dari hasil analisis ini, bisa dijamin bahwa implementasi fungsi yang dilakukan menghasilkan hasil yang sesuai dan akurat, sesuai dengan batasan toleransi error dan memberikan hasil yang tidak jauh berbeda dengan fungsi referensi.
+
+\subsection{Analisis Kompleksitas}
+Kompleksitas dari fungsi dapat dilihat kembali melalui implementasi kode. Dalam TK ini, kompleksitas akan dihitung berdasarkan FLOP (\emph{floating-point operatons}) yang ada.
+Pada implementasi yang dilakukan, akan dianalisis di luar \lstinline{for loop} yang ada.
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+if tol < 1e-14
+	printf("Tolerance is too small and will produce errors, please use larger values\n")
+	res = 0;
+	return;
+endif
+
+n = 100;
+R = zeros(n, n);
+R(1,1) = (b-a)*(f(a)+f(b))/2;
+	\end{lstlisting}
+\end{center}
+
+Di sini, terdapat 5 FLOPs yang terjadi, yaitu pada kondisi toleransi, dan inisiasi elemen pertama \\ \lstinline{R(1,1)}. Lanjut analisis ke dalam \emph{loop}
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+for j = 2:n
+	h = (b-a)/2^(j-1);
+	Rval = 0;
+
+	for i = 1:2^(j-2)
+		Rval = Rval + f(a+(2*i - 1)*h);
+	endfor
+
+		R(j,1) = (1/2)*R(j-1,1) + h*Rval;
+
+	for k = 2:j
+		topval = 4^(k-1)*R(j,k-1) - R(j-1,k-1);
+		botval = 4^(k-1) - 1;
+		R(j,k) = topval/botval;
+	endfor
+
+	if abs(R(j,j)-R(j-1,j-1)) < tol
+		break;
+	endif
+
+endfor
+	\end{lstlisting}
+\end{center}
+Pada bagian ini, di luar \lstinline{for loop} di dalam, terdapat 11 FLOPs, yaitu pada komputasi \lstinline{h}, menghitung \lstinline{R(j,1)} dan mengecek batas toleransi, yang dijumlahkan menghasilkan kompleksitas FLOPs \(O(n)\)
+Lalu, pada \lstinline{for loop} di dalam, terdapat 2 \lstinline{for loop} berbeda. Yang pertama, terdapat 5 FLOPs yang melakukan iterasi hingga \(2^{j-1}\) sehingga memiliki kompleksitas \(O(n*\log_2 j)\).
+Untuk yang kedua, terdapat 11 FLOPs untuk iterasi sampai j dalam menghitung \lstinline{R(j,k)}, sehingga menghasilkan kompleksitas \(O(n*j)\). Dengan mengambil suku terbesar, maka kompleksitas dalam segi FLOPs untuk integrasi Romberg adalah \(O(n*j + n*\log_2 j)\).
+
+Namun, kompleksitas juga bisa dihitung dalam segi \emph{function call}. Apabila kita ingin menghitung dalam segi ini, maka, melihat pada potongan kode di atas, di luar \lstinline{for loop} \emph{nested} terdapat 2 function call untuk menghitung \lstinline{R(1,1)}.
+Lalu, pada \emph{nested loop} terdapat 1 \emph{function call} untuk iterasi \lstinline{Rval} dengan kompleksitas \(O(n*\log_2 j*(1))\). Jadi, untuk kompleksitas \emph{function call}, karena fungsi hanya dipanggil untuk menghitung dalam \emph{composite trapezoidal rule}, maka hanya dilakukan pada iterasi baris sebanyak \(log_2 (j-2)\) sehingga kompleksitas \emph{function call} hanya berupa \(O(n*\log_2 j)\).
+
+Jika dilihat, kompleksitas implementasi Romberg bergantung pada \lstinline{j} dan \lstinline{n}, dengan \lstinline{j} bergantung pada \lstinline{n} karena tabel Romberg membentuk sebuah \emph{lower trianglular matrix}. Nilai \lstinline{n} ini merepresentasikan jumlah baris yang ada dan digunakan pada tabel/matriks Romberg, dengan implementasi di atas memiliki batas maksimum \lstinline{n = 100}.
+Masalah yang dihadapi adalah menentukan jumlah \lstinline{n} yang eksak, karena algoritma Romberg berkembang secara dinamis tergantung pada fungsi dan toleransi, seperti yang dijelaskan pada bagian sebelumnya. Tetapi, aproksimasi dan tebakan kasar bisa dibentuk berdasarkan batas toleransi yang diberikan. Aproksimasi ini menggunakan teori yang disebutkan pada bagian sebelumnya, yaitu pertumbuhan akurasi \(O(h^{2k+2})\) dengan \(k\) adalah kolom ke-\(k\).
+Jika kita memberikan suatu batas toleransi derajat-y atau \(10^y\), maka kita bisa aproksimasi tabel yang dihasilkan akan berukuran \(O(h^{2k+2 = y})\) atau \(O(h^{k=\frac{y-2}{2}})\) dengan \(k\) adalah \(n\).
+Sebuah percobaan dilakukan dengan premis ini. Menggunakan spesifikasi di awal, maka dibentuk grafik yang memetakan dari berbagai batas toleransi sehingga menghasilkan hasil berikut.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{rombergSize}
+	\caption{Grafik Pertumbuhan Ukuran Tabel Romberg}
+	\label{fig:rombergTableGraph}
+\end{figure}
+Dari hasil percobaan, ditemukan bahwa aproksimasi kasar tidak terlalu benar, tetapi hal yang jelas adalah tabel Romberg tumbuh secara fluktuatif tetapi sebanding mengikuti batas toleransi yang diberikan yang semakin kecil (artinya \emph{demand} akurasi meningkat dan perlu komputasi lebih intens yang mengakibatkan tabel Romberg semakin besar).
+Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang diberikan, seperti yang disebutkan pada bagian sebelumnya di mana tipe fungsi yang digunakan akan memengaruhi akurasi dan seberapa banyak komputasi yang perlu dilakukan.
+Maka dari itu, bisa disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n*j + n*\log_2 j)\) dan untuk \emph{function call} adalah \(O(n*\log_2 j)\) dengan \(n\) adalah ukuran tabel Romberg yang bergantung pada fungsi dan batas toleransi serta nilai masukan, dan \(j\) bergantung pada \(n\).
+
 
 \subsection{Analisis Kompleksitas}
 Kompleksitas dari fungsi dapat dilihat kembali melalui implementasi kode. Dalam TK ini, kompleksitas akan dihitung berdasarkan FLOP (\emph{floating-point operatons}) yang ada.
