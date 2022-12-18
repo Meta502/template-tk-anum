@@ -63,6 +63,51 @@ Integrasi numerik adalah teknik untuk melakukan kalkulasi dan aproksimasi pada s
 
 1. \emph{Composite Simpson Method}
 
+\emph{Composite Simpson Method} merupakan metode integrasi numerik yang terdiri dari dua fundamen, yakni aturan komposit dan metode Simpson.
+
+Metode Simpson didasari oleh interpolasi pada tiga titik, yaitu \emph{a}, \(\mathrm{c=\frac{(a+b)}{2}}\), dan \emph{b}. Polinomial kuadratik yang menginterpolasi \emph{f(x)} di ketiga titik tersebut adalah sebagai berikut.
+
+\begin{equation*}
+	\begin{split}
+		p_{2}(x) & = f(a)+\frac{f(c)-f(a)}{c-a}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c)
+	\end{split}
+\end{equation*}
+
+Dengan demikian, diperoleh rumus pendekatan berikut dengan menghitung integral dari polinomial di atas.
+
+\begin{flalign*}
+	S_{f} & = \int_{a}^{b}p_{2}(x)dx                                                                                         &  & \\
+	      & = \int_{a}^{b}\left \{ f(a)+\frac{f(c)-f(a)}{(c-a)}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c) \right \}dx &  & \\
+	      & = \frac{(b-a)}{6}\left \{ f(a)+4f(c)+f(b) \right \}                                                              &  &
+\end{flalign*}
+
+Metode Simpson dapat memberikan hasil yang eksak untuk polinomial dengan orde dua (\(\mathrm{f(x)=x^{2}}\)).
+
+Aturan komposit mendefinisikan pendekatan pembagian integrasi ke dalam beberapa subinterval yang ukurannya lebih kecil. Aturan ini didasari oleh salah satu sifat integral definit berikut.
+
+\begin{equation*}
+	\begin{split}
+		\int_{a}^{b}f(x)dx=\int_{a}^{c}f(x)dx+\int_{c}^{b}f(x)dx
+	\end{split}
+\end{equation*}
+
+Misalkan pada interval \(\mathrm{[a,b]}\) didefinisikan titik-titik \(\mathrm{a=x_{0}<x_{1}<...<x_{n}=b}\), maka didapatkan persamaan integral berikut.
+
+\begin{equation*}
+	\begin{split}
+		\int_{a}^{b}f(x)dx=\sum_{i=1}^{n}\int_{x_{i-1}}^{x_{i}}f(x)dx
+	\end{split}
+\end{equation*}
+
+Dengan menerapkan aturan komposit pada metode Simpson, didapatkan rumus berikut sebagai rumus metode komposit Simpson.
+
+\begin{equation*}
+	\begin{split}
+		\int_{a}^{b}f(x)dx=\frac{1}{6}\sum_{i=1+2}^{n-1}\left \{ f(x_{i-1})+4f(x_{i})+f(x_{i+1}) \right \}
+	\end{split}
+\end{equation*}
+
+Metode komposit Simpson dapat digunakan selama kondisi \(\mathrm{(x_{i+1}-x_{i-1}) \bmod n}\) bernilai genap.
 
 2. \emph{Adaptive Method}
 
@@ -172,7 +217,7 @@ Dengan begitu kita dapat melakukan translasi bentuk menyesuaikan dengan fungsi d
 Dari bentuk di atas maka akan dilakukan dua buah pemanggilan pendekatan integral yang berbeda dengan interval \([-\infty, a]\) dan interval \([-\infty, b]\). Sehingga nilai aproksimasi nilai integral keseluruhan adalah selisih dari pendekatan integrasi kedua interval tersebut.
 Penulis akan menggunakan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} yang mana memiliki rumus sebagai berikut:
 
-\subsubsection{Implementasi Menggunakan Octave}
+\subsection{Implementasi Menggunakan Octave}
 
 Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, penulis dapat menyusun sebuah algoritma pada MATLAb/Octave yaitu fungsi \emph{TrapezoidAdaptive} yang merupakan fungsi untuk pemanggilan rekursif setiap kali terjadinya pemecahan interval karena pendekatan yang masih belum mencapai batas kriteria TOL. Disusun sebagai berikut:
 \begin{center}
@@ -194,7 +239,7 @@ Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, pen
 	\end{lstlisting}
 \end{center}
 
-\subsubsection{Analisis Hasil Komputasi pada Octave}
+\subsection{Analisis Hasil Komputasi pada Octave}
 
 Untuk melihat hasil implementasi, akan digunakan input dengan spesifikasi berikut
 
@@ -409,9 +454,9 @@ Di sini, terdapat 5 FLOPs yang terjadi, yaitu pada kondisi toleransi, dan inisia
 
 (belum analisis kompleksitas algoritma)
 
-\subsection{Implementasi Algoritma Romberg}
+\section{Implementasi Algoritma Romberg}
 
-\subsubsection{Implementasi Menggunakan Octave}
+\subsection{Implementasi Menggunakan Octave}
 
 \par Untuk tugas kelompok kedua ini, diberikan fungsi distribusi normal tabel Z sebagai berikut
 \begin{equation*}
@@ -484,7 +529,7 @@ Toleransi maksimum juga ada di bagian bawah setelah iterasi kolom, yaitu ketika 
 
 Dengan demikian, fungsi tersebut akan menerima beberapa input berupa batas bawah integrasi, batas atas integrasi, batas toleransi yang diinginkan, dan fungsi yang akan di-\emph{pass}, dalam kasus ini adalah fungsi distribusi normal.
 
-\subsubsection{Hasil Komputasi pada Octave}
+\subsection{Hasil Komputasi pada Octave}
 
 Untuk melihat hasil implementasi, akan digunakan input dengan spesifikasi berikut
 
