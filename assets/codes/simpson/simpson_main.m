@@ -4,7 +4,7 @@ format long
 minInf = -1e3;
 low = -1;
 high = 3;
-tol = 1e-12;
+tol = 1e-7;
 
 printf("\nKalkulasi z-Score Integration dengan Komposit Simpson")
 printf("\nSpesifikasi:")
