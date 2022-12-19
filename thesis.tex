@@ -312,9 +312,7 @@ diff = 1.613138163496508e-04
 	\end{lstlisting}
 \end{center}
 
-Dapat dilihat bahwa perbedaannya cukup kecil, dengan tingkat perbedaan pada angka \lstinline{1e-04}. Namun, cara pengintegrasian dengan menggunakan fungsi kompsit Simpson secara langsung (\(P(a \le Z \le b)\)) memiliki hasil yang lebih 
-
-sehingga bisa dibilang keduanya memiliki perbedaan yang insiginifikan dan salah satu dari kedua implementasi bisa digunakan. Tetapi, perlu diketahui bahwa metode \(P(Z \le b ) - P(Z \le a )\) akan memakan waktu komputasi lebih lama karena harus menghitung dari batas bawah \lstinline{-inf}, yang pada implementasi ini berupa \lstinline{-1e3} sehingga memakan \emph{resource} yang lebih besar. Maka, jika kita ingin menghitung pada interval \([a,b]\), lebih baik menggunakan implementasi \(P(a \le Z \le b)\)
+Dapat dilihat bahwa perbedaannya cukup kecil, dengan tingkat perbedaan pada angka \lstinline{1e-04}. Namun, metode \(P(Z \le b ) - P(Z \le a )\) akan memakan waktu komputasi yang lebih lama karena harus menghitung dari batas bawah \lstinline{-inf}, yang pada implementasi ini bernilai \lstinline{-1e3} sehingga memakan \emph{resource} yang lebih besar. Jika kita ingin menghitung pada interval \([a,b]\), sebaiknya gunakan implementasi \(P(a \le Z \le b)\).
 
 \subsection{Toleransi Error}
 
