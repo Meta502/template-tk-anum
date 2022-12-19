@@ -227,8 +227,7 @@ endfunction
 	\end{lstlisting}
 \end{center}
 
-Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus yang sudah diberikan. Namun, digunakan pendekatan \emph{ceil((b-a)/tolˆ(1/4))} sebagai nilai partisi komposit.
-% gimana jelasin si + 4*f(a+h*(2*i-1)) + 2*f(a+h*2*i) nya ya ...
+Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus yang sudah diberikan. Namun, digunakan pendekatan \emph{ceil((b-a)/tolˆ(1/4))} sebagai nilai partisi komposit, \emph{4*f(a+h*(2*i-1))} sebagai nilai \(f(x_{i})\), dan  \emph{2*f(a+h*2*i)} sebagai nilai \(f(x_{i-1})\) dan \(f(x_{i+1})\).
 
 \subsection{Analisis Hasil Komputasi pada Octave}
 
