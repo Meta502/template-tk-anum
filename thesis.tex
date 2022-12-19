@@ -203,31 +203,22 @@ endfunction
 	\end{lstlisting}
 \end{center}
 
-Perlu diingat bahwa metode Simpson didasari oleh interpolasi pada tiga titik, yaitu \emph{a}, \(\mathrm{h=\frac{(a+b)}{2}}\) (\emph{midpoint} atau \emph{halfpoint}), dan \emph{b}.
-
-Dengan menggunakan pendekatan melalui fungsi berikut:
-
-\begin{equation*}
-	\begin{split}
-		\int_{a}^{b}f(x)dx=\frac{h}{3}\sum_{i=1}^{n/2}\left \{ f(x_{i-1})+4f(x_{i})+f(x_{i+1}) \right \}
-	\end{split}
-\end{equation*}
-
-Kodenya:
+Berdasarkan penjelasan metode komposit Simpson, kita hanya perlu memanggil fungsi yang ingin diimplementasinkan ke dalam metodenya. Dalam kasus ini, fungsi tersebut adalah fungsi distribusi normal yang sudah disebutkan sebelumnya. Karena fungsi tersebut sudah diimplementasikan dalam kode Octave, maka kita hanya perlu membuat fungsi komposit Simpson yang menerima fungsi distribusi normal tersebut. Implementasi metode komposit Simpson dalam Octave memerlukan sedikit penyesuaian, dimana titik \emph{c} yang telah dijelaskan perlu diintegrasikan ke dalam fungsi implementasi. Berikut adalah implementasi fungsi komposit Simpson pada Octave.
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
 function [res, n] = composite_simpson(a,b,tol,f)
 
 	n = ceil((b-a)/tol^(1/4));
+	# h point is the c point
 	h = (b-a)/n;
 	res = f(a)+f(b);
 	 
-	# Make sure n is even
+	# make sure n is even
 	n = n+mod(n,2);
 	 
 	for i = 1:n/2
-	  res = res + 4*f(a + h*(2*i-1)) + 2*f(a+h*2*i);
+	  res = res + 4*f(a+h*(2*i-1)) + 2*f(a+h*2*i);
 	endfor
 	 
 	res = res * h / 3;
@@ -235,6 +226,9 @@ function [res, n] = composite_simpson(a,b,tol,f)
 endfunction
 	\end{lstlisting}
 \end{center}
+
+Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus yang sudah diberikan. Namun, digunakan pendekatan \emph{ceil((b-a)/tolˆ(1/4))} sebagai nilai partisi komposit.
+% gimana jelasin si + 4*f(a+h*(2*i-1)) + 2*f(a+h*2*i) nya ya ...
 
 \subsection{Analisis Hasil Komputasi pada Octave}
 
