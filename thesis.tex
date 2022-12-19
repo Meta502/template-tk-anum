@@ -232,6 +232,90 @@ Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus y
 
 \subsection{Analisis Hasil Komputasi pada Octave}
 
+Untuk mendapatkan hasil implementasi, akan digunakan input dengan spesifikasi berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+minInf = -1e3;
+low = -1;
+high = 3;
+tol = 1e-12;
+		
+printf("\nKalkulasi z-Score Integration dengan Komposit Simpson")
+printf("\nSpesifikasi:")
+printf("\nLower Limit: %d", low)
+printf("\nUpper Limit: %d", high)
+printf("\nTolerance Limit: %d\n", tol)
+	\end{lstlisting}
+\end{center}
+
+Nilai \lstinline{minInf} didefinisikan dengan nilai \lstinline{1e-3} karena penggunaan nilai yang lebih kecil akan memakan komputasi lebih lama pada implementasi yang dilakukan. Selain itu, hasil komputasi fungsi distribusi normal di atas akan memiliki nilai yang sangat kecil untuk \(x \le -100\) sehingga akan menjadi \emph{redundant} dan perbedaan yang dihasilkan akan tidak terlalu signifikan.
+
+Dalam implementasi di bawah, fungsi komposit Simpson akan dipanggil dua kali untuk melihat dua cara berbeda untuk menghitung hasil dari integrasi distribusi normal. Perlu diingat bahwa fungsi distribusi normal dapat dihitung dengan dua cara. Misalkan kita ingin memanggil untuk suatu interval \(P(a \le Z \le b)\), maka dapat disusun persamaan baru sebagai berikut.
+
+\begin{equation*}
+	\begin{split}
+		P(a \le Z \le b )  = \phi(a,b) & = \int_{a}^{b} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz \\
+		=  P(Z \le b ) - P(Z \le a )  = \phi(b)-\phi(a) & =  \int_{-\infty}^{b} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} - \int_{-\infty}^{a} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
+	\end{split}
+\end{equation*}
+
+Dengan demikian, kedua cara pengintegrasian distribusi normal dengan menggunakan fungsi kompsit Simpson dapat diimplementasikan pada Octave dengan kode berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+printf("\nHasil Integrasi dengan P(a <= Z <= b)\n")
+[res, n] = composite_simpson(low,high,tol,@z_norm_dist)
+		
+printf("\nHasil Integrasi dengan P(Z <= b) - P(Z <= a)\n")
+[resA, nA] = composite_simpson(minInf,low,tol,@z_norm_dist)
+[resB, nB] = composite_simpson(minInf,high,tol,@z_norm_dist)
+		
+printf("\n")
+ansMinInf = abs(resB-resA)
+	\end{lstlisting}
+\end{center}
+
+Variabel \lstinline{res} merupakan hasil komputasi dari fungsi \(composite_simpson\) dan variabel \lstinline{n} adalah jumlah partisi yang dibentuk untuk menyelesaikan integrasi fungsi distribusi normal yang diberikan. Untuk memperoleh hasil melalui cara \(P(Z \le b ) - P(Z \le a )\), dilakukan pengurangan antara variabel \lstinline{resB} sebagai hasil \(P(Z \le b )\) dengan variabel \lstinline{resA} sebagai hasil \(P(Z \le a )\) yang kemudian hasilnya disimpan ke dalam variabel \lstinline{ansMinInf}. Untuk kasus dengan spesifikasi di atas, \emph{output} yang dihasilkan adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+Kalkulasi z-Score Integration dengan Komposit Simpson
+Spesifikasi:
+Lower Limit: -1
+Upper Limit: 3
+Tolerance Limit: 1e-12
+		
+Hasil Integrasi dengan P(a <= Z <= b)
+res = 0.839997802602522
+n = 4000
+	
+Hasil Integrasi dengan P(Z <= b) - P(Z <= a)
+resA = 0.158816567747806
+nA = 999000
+resB = 0.998653056533978
+nB = 1003000
+		
+ansMinInf = 0.839836488786172
+	\end{lstlisting}
+\end{center}
+
+Dapat dilihat bahwa keduanya menghasilkan nilai yang cukup dekat antara satu dengan yang lainnya, dengan \(P(a \le Z \le b)= 0.839997802602522\)  dan \(P(Z \le b ) - P(Z \le a ) = 0.839836488786172\). Jika kita ingin melihat lebih detail, keduanya memiliki perbedaan sebagai berikut (lengkap dengan implementasi Octave beserta hasilnya).
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+printf("\nPerbedaan antara P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)\n")
+diff = res - ansMinInf
+
+Perbedaan antara P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)
+diff = 1.613138163496508e-04
+	\end{lstlisting}
+\end{center}
+
+Dapat dilihat bahwa perbedaannya cukup kecil, dengan tingkat perbedaan pada angka \lstinline{1e-04}. Namun, cara pengintegrasian dengan menggunakan fungsi kompsit Simpson secara langsung (\(P(a \le Z \le b)\)) memiliki hasil yang lebih 
+
+sehingga bisa dibilang keduanya memiliki perbedaan yang insiginifikan dan salah satu dari kedua implementasi bisa digunakan. Tetapi, perlu diketahui bahwa metode \(P(Z \le b ) - P(Z \le a )\) akan memakan waktu komputasi lebih lama karena harus menghitung dari batas bawah \lstinline{-inf}, yang pada implementasi ini berupa \lstinline{-1e3} sehingga memakan \emph{resource} yang lebih besar. Maka, jika kita ingin menghitung pada interval \([a,b]\), lebih baik menggunakan implementasi \(P(a \le Z \le b)\)
+
 \subsection{Toleransi Error}
 
 \subsection{Analisis Kompleksitas}
