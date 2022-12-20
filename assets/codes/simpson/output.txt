@@ -21,6 +21,16 @@ ansMinInf = 0.839946170820365
 Perbedaan antara P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)
 diff = 4.961146653992277e-05
 
+Hasil Integrasi dengan quadgk
+
+qAns = 0.839994848036913
+err = 5.904228928682587e-14
+
+Error dengan Hasil Integrasi melalui quadgk
+
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+
 Hasil Integrasi dengan normcdf
 
 cdfAns = 0.839994848036913
