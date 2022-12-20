@@ -4,22 +4,22 @@ Kalkulasi z-Score Integration dengan Komposit Simpson
 Spesifikasi:
 Lower Limit: -1
 Upper Limit: 3
-Tolerance Limit: 1e-12
+Tolerance Limit: 1e-07
 
 Hasil Integrasi dengan P(a <= Z <= b)
-res = 0.839997802602522
-n = 4000
+res = 0.839995782286905
+n = 12650
 
 Hasil Integrasi dengan P(Z <= b) - P(Z <= a)
-resA = 0.158816567747806
-nA = 999000
-resB = 0.998653056533978
-nB = 1003000
+resA = 0.158706265829248
+nA = 3159116
+resB = 0.998652436649612
+nB = 3171766
 
-ansMinInf = 0.839836488786172
+ansMinInf = 0.839946170820365
 
 Perbedaan antara P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)
-diff = 1.613138163496508e-04
+diff = 4.961146653992277e-05
 
 Hasil Integrasi dengan quadgk
 
@@ -28,13 +28,15 @@ err = 5.904228928682587e-14
 
 Error dengan Hasil Integrasi melalui quadgk
 
-P(a <= Z <= b): 2.95457e-06
-P(Z <= b) - P(Z <= a): 0.000158359
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+
 Hasil Integrasi dengan normcdf
 
 cdfAns = 0.839994848036913
 
 Error dengan Hasil Integrasi melalui normcdf
 
-P(a <= Z <= b): 2.95457e-06
-P(Z <= b) - P(Z <= a): 0.000158359
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+>>

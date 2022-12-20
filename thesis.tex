@@ -229,6 +229,8 @@ endfunction
 
 Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus yang sudah diberikan. Namun, digunakan pendekatan \emph{ceil((b-a)/tolˆ(1/4))} sebagai nilai partisi komposit, \emph{4*f(a+h*(2*i-1))} sebagai nilai \(f(x_{i})\), dan  \emph{2*f(a+h*2*i)} sebagai nilai \(f(x_{i-1})\) dan \(f(x_{i+1})\).
 
+Selain itu, diberikan juga \emph{guard} berupa batas toleransi maksimum dari perhitungan. Jumlah iterasi penghitungan hasil integral yang dilakukan dibatasi oleh \emph{n/2}, yang mana merupakan setengah nilai dari jumlah partisi komposit yang "dibentuk".
+
 \subsection{Analisis Hasil Komputasi pada Octave}
 
 Untuk mendapatkan hasil implementasi, akan digunakan input dengan spesifikasi berikut.

@@ -4,7 +4,7 @@ format long
 minInf = -1e3;
 low = -1;
 high = 3;
-tol = 1e-12;
+tol = 1e-7;
 
 printf("\nKalkulasi z-Score Integration dengan Komposit Simpson")
 printf("\nSpesifikasi:")
@@ -34,7 +34,7 @@ err2 = abs(qAns - ansMinInf);
 printf("\nP(a <= Z <= b): %d", err1)
 printf("\nP(Z <= b) - P(Z <= a): %d", err2)
 
-printf("\nHasil Integrasi dengan normcdf\n\n")
+printf("\n\nHasil Integrasi dengan normcdf\n\n")
 cdf = normcdf([low high]);
 cdfAns = cdf(2) - cdf(1)
 
