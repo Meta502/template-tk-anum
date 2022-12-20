@@ -25,7 +25,7 @@ ansMinInf = abs(resB-resA)
 printf("\nPerbedaan antara P(a <= Z <= b) dan P(Z <= b) - P(Z <= a)\n")
 diff = res - ansMinInf
 
-printf("\n\nHasil Integrasi dengan normcdf\n\n")
+printf("\nHasil Integrasi dengan normcdf\n\n")
 cdf = normcdf([low high]);
 cdfAns = cdf(2) - cdf(1)
 
