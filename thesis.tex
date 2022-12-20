@@ -209,7 +209,7 @@ Berdasarkan penjelasan metode komposit Simpson, kita hanya perlu memanggil fungs
 	\begin{lstlisting}[language=Octave]
 function [res, n] = composite_simpson(a,b,tol,f)
 
-	n = ceil((b-a)/tol^(1/4));
+	n = ceil((b-a)/tol^(1/2));
 	# h point is the c point
 	h = (b-a)/n;
 	res = f(a)+f(b);
@@ -227,9 +227,11 @@ endfunction
 	\end{lstlisting}
 \end{center}
 
-Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus yang sudah diberikan. Namun, digunakan pendekatan \emph{ceil((b-a)/tolˆ(1/4))} sebagai nilai partisi komposit, \emph{4*f(a+h*(2*i-1))} sebagai nilai \(f(x_{i})\), dan  \emph{2*f(a+h*2*i)} sebagai nilai \(f(x_{i-1})\) dan \(f(x_{i+1})\).
+Jika diperhatikan, fungsi tersebut memang hanya merupakan translasi dari rumus yang sudah diberikan. Namun, digunakan pendekatan \emph{ceil((b-a)/tolˆ(1/2))} sebagai nilai partisi komposit, \emph{4*f(a+h*(2*i-1))} sebagai nilai \(f(x_{i})\), dan  \emph{2*f(a+h*2*i)} sebagai nilai \(f(x_{i-1})\) dan \(f(x_{i+1})\).
 
-Selain itu, diberikan juga \emph{guard} berupa batas toleransi maksimum dari perhitungan. Jumlah iterasi penghitungan hasil integral yang dilakukan dibatasi oleh \emph{n/2}, yang mana merupakan setengah nilai dari jumlah partisi komposit yang "dibentuk".
+Selain itu, diberikan juga \emph{guard} berupa batas toleransi maksimum dari perhitungan. Jumlah iterasi penghitungan hasil integral yang dilakukan dibatasi oleh \emph{n/2}, yang mana merupakan setengah nilai dari jumlah partisi komposit yang dibentuk sebelumnya. Apabila variabel i telah mencapai lebih dari setengah nilai \emph{n}, maka iterasi akan dihentikan.
+
+Dengan demikian, fungsi yang telah dibentuk akan menerima beberapa input berupa batas bawah integrasi, batas atas integrasi, batas toleransi yang diinginkan, dan fungsi yang akan dihitung nilai integrasinya, yang mana dalam kasus ini adalah fungsi distribusi normal.
 
 \subsection{Analisis Hasil Komputasi pada Octave}
 
