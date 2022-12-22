@@ -417,8 +417,46 @@ Nilai error yang diperoleh juga bisa diatur melalui batas toleransi; semakin kec
 Dapat disimpulkan bahwa hasil error yang dihasilkan oleh kedua cara metode komposit Simpson ternyata kurang akurat dibandingkan hasil komputasi integrasi aktual dari fungsi bawaan Octave. Secara prinsip aturan komposit, akurasi metode komposit Simpson dapat ditinggikan dengan menaikkan jumlah partisi yang dibuat untuk melakukan komputasi. Namun, hal ini dapat membuat jumlah komputasi yang dilakukan semakin banyak karena meningkatnya jumlah partisi sehingga \emph{running time} komputasi akan semakin lama.
 
 \subsection{Analisis Kompleksitas}
+Kompleksitas dari fungsi dapat dilihat kembali melalui implementasi kode. Dalam tugas ini, kompleksitas akan dihitung berdasarkan FLOP (\emph{floating-point operatons}) yang ada.
+Pada implementasi yang dilakukan, operasi di luar \lstinline{loop} akan dianalisis terlebih dahulu.
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+n = ceil((b-a)/tol^(1/2));
+h = (b-a)/n;
+res = f(a)+f(b);
+	  
+n = n+mod(n,2);
+	\end{lstlisting}
+\end{center}
+
+Di sini, terdapat 9 FLOPs yang terjadi; 4 FLOPs pada inisiasi variabel \emph{n}, 2 FLOPs pada inisiasi variabel \emph{h}, 1 FLOP pada inisiasi variabel \emph{res}, dan 2 FLOPs pada pemastian variabel \emph{n} bernilai genap.
+
+Analisis operasi di dalam \emph{loop} adalah sebagai berikut.
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+for i = 1:n/2
+	res = res + 4*f(a + h*(2*i-1)) + 2*f(a+h*2*i);
+endfor
+	\end{lstlisting}
+\end{center}
+
+\par Pada bagian di dalam \lstinline{loop}, terdapat 11 FLOPs pada komputasi nilai \emph{res}. Apabila dijumlahkan dengan \emph{guard loop}, maka dihasilkan kompleksitas FLOPs \(O(n/2)\) dari operasi di dalam \lstinline{loop}.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+res = res * h / 3;
+	\end{lstlisting}
+\end{center}
+
+Pada bagian terakhir, terdapat 2 FLOPs pada komputasi nilai akhir \emph{res}.
+
+Dengan mengambil suku terbesar, kompleksitas FLOPs untuk integrasi dengan metode komposit Simpson adalah sebesar \(O(n/2)\).
 
 % 2 + (n/2)*2 function calls
+
+Namun, kompleksitas juga bisa dihitung dalam segi \emph{function call}. Apabila kita ingin menghitung dalam segi ini, maka terdapat 2 \emph{function calls} di luar \emph{loop} untuk inisiasi nilai awal variabel \emph{res} dan 2 \emph{function calls} di dalam \emph{loop} untuk mencari nilai integrasi (\emph{res}). Dengan mengambil suku terbesar, kompleksitas \emph{function call} pada metode komposit Simpson adalah berupa \(O(2*(n/2))\) (dengan kata lain, \(O(n)\)).
+
+Dengan demikian, dapat disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n/2)\) dan untuk \emph{function call} adalah \(O(n)\) dengan \(n\) adalah jumlah partisi integrasi yang dihitung pada awal eksekusi program.
 
 \section{Implementasi Adaptive Method}
 \par Fungsi yang diberikan pada distribusi normal pada persoalan tertulis sebagai berikut:
@@ -1057,8 +1095,6 @@ Sebuah percobaan dilakukan dengan premis ini. Menggunakan spesifikasi di awal, m
 	\caption{Grafik Pertumbuhan Ukuran Tabel Romberg}
 	\label{fig:rombergTableGraph}
 \end{figure}
-
-\newpage
 
 Dari hasil percobaan, ditemukan bahwa aproksimasi kasar tidak terlalu benar, namun hal yang jelas adalah tabel Romberg tumbuh secara fluktuatif tetapi sebanding mengikuti batas toleransi yang diberikan yang semakin kecil (artinya \emph{demand} akurasi meningkat dan perlu komputasi lebih intens yang mengakibatkan tabel Romberg semakin besar).
 Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang diberikan, seperti yang disebutkan pada bagian sebelumnya di mana tipe fungsi yang digunakan akan memengaruhi akurasi dan seberapa banyak komputasi yang perlu dilakukan.
