@@ -712,7 +712,11 @@ Berikut dilakukan perhitungan FLOP (\emph{floating-point operations}) pada imple
 	\end{lstlisting}
 \end{center}
 
-\emph{Adaptive quadrature} merupakan metode aproksimasi fungsi integrasi yang rekursif dengan setiap kondisi yang belum memenuhi akan membagi \emph{problem} menjadi 2 buah \emph{sub-problem}. Perhitungan kompleksitas berikut ini akan dihitung dengan menghitung \emph{function call}. Untuk setiap pemanggilan fungsi di atas dilakukan 3 \emph{function call} untuk mendapatkan \emph{f(a), f(b), f(c)}. Untuk tiap pemecahan
+\emph{Adaptive quadrature} merupakan metode aproksimasi fungsi integrasi yang rekursif dengan setiap kondisi yang belum memenuhi akan membagi \emph{problem} menjadi 2 buah \emph{sub-problem}. Perhitungan kompleksitas berikut ini akan dihitung dengan menghitung \emph{function call}. Untuk setiap pemanggilan fungsi di atas dilakukan 3 \emph{function call} untuk mendapatkan \emph{f(a), f(b), dan f(c)}.
+Pengembalian nilai aproksimasi adalah penjumlahan hasil aproksimasi nilai integrasi interval yang dipecah menjadi TrapezoidAdaptive(f,a,c,Tol/2,ori) dan TrapezoidAdaptive(f,c,b,Tol/2,ori). Hasil penggabungan keduanya bernilai O(1). Pemanggilan perhitungan untuk Q1, Q2, dan Q3 juga bernilai O(1). Setiap pemanggilan fungsi TrapezoidAdaptive maka besar interval akan semakin pendek menjadi n/2 dengan n adalah panjang interval yakni \emph{n = b-a}.
+Dengan pembentukan fungsi \emph{recursion tree}-nya ketinggian \emph{tree} mencapai \emph{log(n)+1} dan secara \emph{recursion equation} digambarkan sebagai berikut:
+T(n) = T(n/2) + T(n/2) + O(1)
+Dengan \emph{cost} yang sama untuk tiap pemanggilan fungsinya maka total \emph{cost} bernilai \emph{\(O(n log n + 1)\)}. Dengan 3 kali pemanggilan \emph{function call} di setiap fungsi, maka total pemanggilan \emph{function call} secara keseluruhan \emph{asymptotic} dituliskan sebagai \emph{\(O(3*n log n)\)}.
 
 \section{Implementasi Algoritma Romberg}
 
