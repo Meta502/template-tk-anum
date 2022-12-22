@@ -403,9 +403,10 @@ P(Z <= b) - P(Z <= a): 4.86772e-05
 	\end{lstlisting}
 \end{center}
 
-Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{normcdf} memiliki hasil yang sama persis dengan hasil integrasi dengan fungsi \lstinline{quadgk}. Dapat disimpulkan pula bahwa fungsi \lstinline{quadgk} sudah cukup akurat dan sesuai dengan fungsi distribusi normal pada Octave, yaitu \lstinline{normcdf}.
+Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{normcdf} memiliki hasil yang sama persis dengan hasil integrasi dengan fungsi \lstinline{quadgk}. Dapat disimpulkan pula bahwa fungsi \lstinline{quadgk} sudah cukup akurat dan sesuai dengan fungsi distribusi normal pada Octave, yaitu \lstinline{normcdf}.\\
 
 Nilai error yang diperoleh juga bisa diatur melalui batas toleransi; semakin kecil toleransinya, maka semakin kecil errornya. Hal ini dapat dilihat pada grafik berikut.
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.5\textwidth]{comp_simp_tol}
@@ -417,7 +418,7 @@ Dapat disimpulkan bahwa hasil error yang dihasilkan oleh kedua cara metode kompo
 
 \subsection{Analisis Kompleksitas}
 
-
+% 2 + (n/2)*2 function calls
 
 \section{Implementasi Adaptive Method}
 \par Fungsi yang diberikan pada distribusi normal pada persoalan tertulis sebagai berikut:
