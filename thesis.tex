@@ -405,7 +405,7 @@ P(Z <= b) - P(Z <= a): 4.86772e-05
 
 Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{normcdf} memiliki hasil yang sama persis dengan hasil integrasi dengan fungsi \lstinline{quadgk}. Dapat disimpulkan pula bahwa fungsi \lstinline{quadgk} sudah cukup akurat dan sesuai dengan fungsi distribusi normal pada Octave, yaitu \lstinline{normcdf}.
 
-Hasil error yang dihasilkan oleh kedua cara metode komposit Simpson ternyata kurang akurat dibandingkan hasil komputasi integrasi aktual dari fungsi bawaan Octave. Secara prinsip, akurasi aturan komposit dapat ditinggikan dengan menaikkan jumlah partisi yang dibuat untuk melakukan komputasi. Namun, hal ini dapat membuat kompleksitas algoritma semakin rumit sehingga \emph{running time} komputasi akan semakin lama.
+Dapat disimpulkan bahwa hasil error yang dihasilkan oleh kedua cara metode komposit Simpson ternyata kurang akurat dibandingkan hasil komputasi integrasi aktual dari fungsi bawaan Octave. Secara prinsip, akurasi aturan komposit dapat ditinggikan dengan menaikkan jumlah partisi yang dibuat untuk melakukan komputasi. Namun, hal ini dapat membuat kompleksitas algoritma semakin rumit sehingga \emph{running time} komputasi akan semakin lama.
 
 % intinya ntar hitung lewat normcdf terus state kalau err > tol sehingga kurang akurat, prinsip si komposit kalau mau lebih akurat = naikin nilai partisinya tapi risikonya kompleksitas semakin rumit sehingga running time akan semakin lama.
 
