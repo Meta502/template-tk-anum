@@ -319,9 +319,144 @@ Dapat dilihat bahwa perbedaannya cukup kecil, dengan tingkat perbedaan pada angk
 
 \subsection{Toleransi Error}
 
-% intinya ntar hitung lewat normcdf terus state kalau err > tol sehingga kurang akurat, prinsip si komposit kalau mau lebih akurat = naikin nilai partisinya tapi risikonya kompleksitas semakin rumit sehingga running time akan semakin lama.
+Error global pada metode komposit Simpson tidak dapat dihitung secara pasti dikarenakan aturan komposit bekerja dengan cara membagi integrasi ke dalam partisi yang didefinisikan pada awal program, yakni \(n = ceil((b-a)/tol\)\textasciicircum{}\((1/2))\). Maka, kita akan menggunakan penghitungan error dengan pendekatan error lokal per interval partisi.
+
+Berdasarkan referensi yang digunakan, rumus error dari metode Simpson adalah sebagai berikut.
+\begin{equation*}
+	\begin{split}
+		E(a,b) = -\frac{f^{(4)}(\xi)}{2880}(b-a)^{5}
+	\end{split}
+\end{equation*}
+
+Metode komposit Simpson bekerja dengan cara membagi integrasi ke dalam suatu jumlah partisi dengan ukuran interval yang sama, sehingga rumus error metode komposit Simpson dapat dibentuk dengan menjumlahkan error metode Simpson sebanyak \emph{n} sebagai jumlah partisi dimana titik \(a\) merupakan \(X_{i-1}\) dan titik \(b\) merupakan \(X_{i}\).
+\begin{equation*}
+	\begin{split}
+		\sum_{i=a}^{b}E(X_{i-1},X_{i}) = \sum_{i=a}^{b}-\frac{f^{(4)}(\xi)}{2880}(X_{i}-X_{i-1})^{5}
+	\end{split}
+\end{equation*}
+
+Berdasarkan contoh eksekusi pada bagian sebelumnya, kita dapat membuktikan hasil implementasi kita melalui perbandingan hasil dengan hasil komputasi integrasi aktual dari fungsi bawaan Octave.
+
+Fungsi pertama yang akan diuji adalah menggunakan fungsi \lstinline{quadgk}, yaitu fungsi integrasi dari Octave menggunakan algoritma \emph{adaptive Gauss-Konrod quadrature}. Menurut Octave, fungsi \lstinline{quadgk} memiliki karakteristik tingkat akurasi \emph{medium (1e-6 - 1e-9)} dengan \emph{smooth integrands}, menangani fungsi osilasi dan batas yang tak terbatas, dan memiliki tingkat akurasi yang lebih baik daripada fungsi integrasi satu variabel lain seperti \lstinline{quad, quadv, dan quadl}. Karakteristik-karakteristik fungsi \lstinline{quadgk} yang telah disebutkan sebelumnya menjadi alasan kami untuk menggunakan fungsi ini sebagai referensi.
+
+Perbandingan ini diimplementasikan sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+printf("\nHasil Integrasi dengan quadgk\n\n")
+[qAns, err] = quadgk(@z_norm_dist, low, high)
+		
+printf("\nError dengan Hasil Integrasi melalui quadgk\n")
+err1 = abs(qAns - res);
+err2 = abs(qAns - ansMinInf);
+printf("\nP(a <= Z <= b): %d", err1)
+printf("\nP(Z <= b) - P(Z <= a): %d", err2)
+	\end{lstlisting}
+\end{center}
+
+Hasil yang dihasilkan dari implementasi di atas adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+Hasil Integrasi dengan quadgk
+
+qAns = 0.839994848036913
+err = 5.904228928682587e-14
+		
+Error dengan Hasil Integrasi melalui quadgk
+
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+	\end{lstlisting}
+\end{center}
+
+Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{quadgk} memiliki akurasi dan error dalam tingkat \lstinline{1e-14} sehingga dapat dikatakan cukup akurat. Pada implementasi metode komposit Simpson, diberikan spesifikasi batas toleransi \lstinline{1e-7}. Namun, tingkat perbedaan yang menunjukan error berada pada derajat 7 atau \lstinline{1e-07} untuk cara integrasi secara langsung dan derajat 5 atau \lstinline{1e-05} untuk cara integrasi dengan memecah integrasi menjadi \(P(Z \le b ) - P(Z \le a )\). Hal ini menandakan bahwa implementasi integrasi secara langsung memiliki akurasi yang lebih baik daripada implementasi integrasi secara terpisah, namun melebihi batas toleransi yang ditentukan sehingga kurang akurat dibandingkan hasil integrasi dengan fungsi \lstinline{quadgk}.
+
+Selain fungsi \lstinline{quadgk}, Octave juga memberikan fungsi untuk menghitung fungsi distribusi normal yang ditugaskan kepada kami, yaitu fungsi \lstinline{normcdf}. Implementasi perbandingan menggunakan fungsi \lstinline{normcdf} adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+printf("\n\nHasil Integrasi dengan normcdf\n\n")
+cdf = normcdf([low high]);
+cdfAns = cdf(2) - cdf(1)
+		
+printf("\nError dengan Hasil Integrasi melalui normcdf\n")
+err1 = abs(cdfAns - res);
+err2 = abs(cdfAns - ansMinInf);
+printf("\nP(a <= Z <= b): %d", err1)
+printf("\nP(Z <= b) - P(Z <= a): %d", err2)
+	\end{lstlisting}
+\end{center}
+
+Hasil yang dihasilkan dari implementasi di atas adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+Hasil Integrasi dengan normcdf
+
+cdfAns = 0.839994848036913
+
+Error dengan Hasil Integrasi melalui normcdf
+
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+	\end{lstlisting}
+\end{center}
+
+Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{normcdf} memiliki hasil yang sama persis dengan hasil integrasi dengan fungsi \lstinline{quadgk}. Dapat disimpulkan pula bahwa fungsi \lstinline{quadgk} sudah cukup akurat dan sesuai dengan fungsi distribusi normal pada Octave, yaitu \lstinline{normcdf}.\\
+
+Nilai error yang diperoleh juga bisa diatur melalui batas toleransi; semakin kecil toleransinya, maka semakin kecil errornya. Hal ini dapat dilihat pada grafik berikut.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{comp_simp_tol}
+	\caption{Grafik Nilai Perbedaan antara Hasil Komputasi Komposit Simpson dan Fungsi Referensi}
+	\label{fig:difGraph}
+\end{figure}
+
+Dapat disimpulkan bahwa hasil error yang dihasilkan oleh kedua cara metode komposit Simpson ternyata kurang akurat dibandingkan hasil komputasi integrasi aktual dari fungsi bawaan Octave. Secara prinsip aturan komposit, akurasi metode komposit Simpson dapat ditinggikan dengan menaikkan jumlah partisi yang dibuat untuk melakukan komputasi. Namun, hal ini dapat membuat jumlah komputasi yang dilakukan semakin banyak karena meningkatnya jumlah partisi sehingga \emph{running time} komputasi akan semakin lama.
 
 \subsection{Analisis Kompleksitas}
+Kompleksitas dari fungsi dapat dilihat kembali melalui implementasi kode. Dalam tugas ini, kompleksitas akan dihitung berdasarkan FLOP (\emph{floating-point operatons}) yang ada.
+Pada implementasi yang dilakukan, operasi di luar \lstinline{loop} akan dianalisis terlebih dahulu.
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+n = ceil((b-a)/tol^(1/2));
+h = (b-a)/n;
+res = f(a)+f(b);
+	  
+n = n+mod(n,2);
+	\end{lstlisting}
+\end{center}
+
+Di sini, terdapat 9 FLOPs yang terjadi; 4 FLOPs pada inisiasi variabel \emph{n}, 2 FLOPs pada inisiasi variabel \emph{h}, 1 FLOP pada inisiasi variabel \emph{res}, dan 2 FLOPs pada pemastian variabel \emph{n} bernilai genap.
+
+Analisis operasi di dalam \emph{loop} adalah sebagai berikut.
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+for i = 1:n/2
+	res = res + 4*f(a + h*(2*i-1)) + 2*f(a+h*2*i);
+endfor
+	\end{lstlisting}
+\end{center}
+
+\par Pada bagian di dalam \lstinline{loop}, terdapat 11 FLOPs pada komputasi nilai \emph{res}. Apabila dijumlahkan dengan \emph{guard loop}, maka dihasilkan kompleksitas FLOPs \(O(n/2)\) dari operasi di dalam \lstinline{loop}.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+res = res * h / 3;
+	\end{lstlisting}
+\end{center}
+
+Pada bagian terakhir, terdapat 2 FLOPs pada komputasi nilai akhir \emph{res}.
+
+Dengan mengambil suku terbesar, kompleksitas FLOPs untuk integrasi dengan metode komposit Simpson adalah sebesar \(O(n/2)\).
+
+% 2 + (n/2)*2 function calls
+
+Namun, kompleksitas juga bisa dihitung dalam segi \emph{function call}. Apabila kita ingin menghitung dalam segi ini, maka terdapat 2 \emph{function calls} di luar \emph{loop} untuk inisiasi nilai awal variabel \emph{res} dan 2 \emph{function calls} di dalam \emph{loop} untuk mencari nilai integrasi (\emph{res}). Dengan mengambil suku terbesar, kompleksitas \emph{function call} pada metode komposit Simpson adalah berupa \(O(2*(n/2))\) (dengan kata lain, \(O(n)\)).
+
+Dengan demikian, dapat disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n/2)\) dan untuk \emph{function call} adalah \(O(n)\) dengan \(n\) adalah jumlah partisi integrasi yang dihitung pada awal eksekusi program.
 
 \section{Implementasi Adaptive Method}
 \par Fungsi yang diberikan pada distribusi normal pada persoalan tertulis sebagai berikut:
@@ -836,7 +971,7 @@ P(Z <= b) - P(Z <= a): 1.76386e-11
 	\end{lstlisting}
 \end{center}
 
-dari sini, kita bisa melihat bahwa \lstinline{quadgk} memiliki akurasi dan error dalam tingkat \lstinline{1e-14} sehingga bisa dibilang cukup akurat. Pada implementasi Romberg, diberikan spesifikasi batas toleransi \lstinline{1e-7}, tetapi dari perbandingan di atas, tingkat perbedaan yang menunjukan eror berada pada derajat 11 atau \lstinline{1e-11}.
+Dari sini, kita bisa melihat bahwa \lstinline{quadgk} memiliki akurasi dan error dalam tingkat \lstinline{1e-14} sehingga bisa dibilang cukup akurat. Pada implementasi Romberg, diberikan spesifikasi batas toleransi \lstinline{1e-7}, tetapi dari perbandingan di atas, tingkat perbedaan yang menunjukan eror berada pada derajat 11 atau \lstinline{1e-11}.
 Hal ini menandakan bahwa implementasi memiliki akurasi yang lebih bagus daripada batas toleransi yang ditentukan.
 
 Selain \lstinline{quadgk}, Octave juga memberikan fungsi untuk menghitung fungsi distribusi normal yang ditugaskan untuk kami, yaitu \lstinline{normcdf}. Implementasi perbandingan adalah sebagai berikut
@@ -946,73 +1081,8 @@ Sebuah percobaan dilakukan dengan premis ini. Menggunakan spesifikasi di awal, m
 	\caption{Grafik Pertumbuhan Ukuran Tabel Romberg}
 	\label{fig:rombergTableGraph}
 \end{figure}
+
 Dari hasil percobaan, ditemukan bahwa aproksimasi kasar tidak terlalu benar, namun hal yang jelas adalah tabel Romberg tumbuh secara fluktuatif tetapi sebanding mengikuti batas toleransi yang diberikan yang semakin kecil (artinya \emph{demand} akurasi meningkat dan perlu komputasi lebih intens yang mengakibatkan tabel Romberg semakin besar).
-Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang diberikan, seperti yang disebutkan pada bagian sebelumnya di mana tipe fungsi yang digunakan akan memengaruhi akurasi dan seberapa banyak komputasi yang perlu dilakukan.
-Maka dari itu, bisa disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n*j + n*2^j)\) dan untuk \emph{function call} adalah \(O(n*2^j)\) dengan \(n\) adalah ukuran tabel Romberg yang bergantung pada fungsi dan batas toleransi serta nilai masukan, dan \(j\) bergantung pada \(n\).
-
-
-\subsection{Analisis Kompleksitas}
-Kompleksitas dari fungsi dapat dilihat kembali melalui implementasi kode. Dalam TK ini, kompleksitas akan dihitung berdasarkan FLOP (\emph{floating-point operatons}) yang ada.
-Pada implementasi yang dilakukan, akan dianalisis di luar \lstinline{for loop} yang ada.
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-if tol < 1e-14
-	printf("Tolerance is too small and will produce errors, please use larger values\n")
-	res = 0;
-	return;
-endif
-
-n = 100;
-R = zeros(n, n);
-R(1,1) = (b-a)*(f(a)+f(b))/2;
-	\end{lstlisting}
-\end{center}
-
-Di sini, terdapat 5 FLOPs yang terjadi, yaitu pada kondisi toleransi, dan inisiasi elemen pertama \\ \lstinline{R(1,1)}. Lanjut analisis ke dalam \emph{loop}
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-for j = 2:n
-	h = (b-a)/2^(j-1);
-	Rval = 0;
-
-	for i = 1:2^(j-2)
-		Rval = Rval + f(a+(2*i - 1)*h);
-	endfor
-
-		R(j,1) = (1/2)*R(j-1,1) + h*Rval;
-
-	for k = 2:j
-		topval = 4^(k-1)*R(j,k-1) - R(j-1,k-1);
-		botval = 4^(k-1) - 1;
-		R(j,k) = topval/botval;
-	endfor
-
-	if abs(R(j,j)-R(j-1,j-1)) < tol
-		break;
-	endif
-
-endfor
-	\end{lstlisting}
-\end{center}
-Pada bagian ini, di luar \lstinline{for loop} di dalam, terdapat 11 FLOPs, yaitu pada komputasi \lstinline{h}, menghitung \lstinline{R(j,1)} dan mengecek batas toleransi, yang dijumlahkan menghasilkan kompleksitas FLOPs \(O(n)\)
-Lalu, pada \lstinline{for loop} di dalam, terdapat 2 \lstinline{for loop} berbeda. Yang pertama, terdapat 5 FLOPs yang melakukan iterasi hingga \(2^{j-1}\) sehingga memiliki kompleksitas \(O(n*2^j)\).
-Untuk yang kedua, terdapat 11 FLOPs untuk iterasi sampai j dalam menghitung \lstinline{R(j,k)}, sehingga menghasilkan kompleksitas \(O(n*j)\). Dengan mengambil suku terbesar, maka kompleksitas dalam segi FLOPs untuk integrasi Romberg adalah \(O(n*j + n*2^j)\).
-
-Namun, kompleksitas juga bisa dihitung dalam segi \emph{function call}. Apabila kita ingin menghitung dalam segi ini, maka, melihat pada potongan kode di atas, di luar \lstinline{for loop} \emph{nested} terdapat 2 function call untuk menghitung \lstinline{R(1,1)}.
-Lalu, pada \emph{nested loop} terdapat 1 \emph{function call} untuk iterasi \lstinline{Rval} dengan kompleksitas \(O(n*2^j*(1))\). Jadi, untuk kompleksitas \emph{function call}, karena fungsi hanya dipanggil untuk menghitung dalam \emph{composite trapezoidal rule}, maka hanya dilakukan pada iterasi baris sebanyak \(log_2 (j-2)\) sehingga kompleksitas \emph{function call} hanya berupa \(O(n*2^j)\).
-
-Jika dilihat, kompleksitas implementasi Romberg bergantung pada \lstinline{j} dan \lstinline{n}, dengan \lstinline{j} bergantung pada \lstinline{n} karena tabel Romberg membentuk sebuah \emph{lower trianglular matrix}. Nilai \lstinline{n} ini merepresentasikan jumlah baris yang ada dan digunakan pada tabel/matriks Romberg, dengan implementasi di atas memiliki batas maksimum \lstinline{n = 100}.
-Masalah yang dihadapi adalah menentukan jumlah \lstinline{n} yang eksak, karena algoritma Romberg berkembang secara dinamis tergantung pada fungsi dan toleransi, seperti yang dijelaskan pada bagian sebelumnya. Tetapi, aproksimasi dan tebakan kasar bisa dibentuk berdasarkan batas toleransi yang diberikan. Aproksimasi ini menggunakan teori yang disebutkan pada bagian sebelumnya, yaitu pertumbuhan akurasi \(O(h^{2k+2})\) dengan \(k\) adalah kolom ke-\(k\).
-Jika kita memberikan suatu batas toleransi derajat-y atau \(10^y\), maka kita bisa aproksimasi tabel yang dihasilkan akan berukuran \(O(h^{2k+2 = y})\) atau \(O(h^{k=\frac{y-2}{2}})\) dengan \(k\) adalah \(n\).
-Sebuah percobaan dilakukan dengan premis ini. Menggunakan spesifikasi di awal, maka dibentuk grafik yang memetakan dari berbagai batas toleransi sehingga menghasilkan hasil berikut.
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.5\textwidth]{rombergSize}
-	\caption{Grafik Pertumbuhan Ukuran Tabel Romberg}
-	\label{fig:rombergTableGraph}
-\end{figure}
-Dari hasil percobaan, ditemukan bahwa aproksimasi kasar tidak terlalu benar, tetapi hal yang jelas adalah tabel Romberg tumbuh secara fluktuatif tetapi sebanding mengikuti batas toleransi yang diberikan yang semakin kecil (artinya \emph{demand} akurasi meningkat dan perlu komputasi lebih intens yang mengakibatkan tabel Romberg semakin besar).
 Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang diberikan, seperti yang disebutkan pada bagian sebelumnya di mana tipe fungsi yang digunakan akan memengaruhi akurasi dan seberapa banyak komputasi yang perlu dilakukan.
 Maka dari itu, bisa disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n*j + n*2^j)\) dan untuk \emph{function call} adalah \(O(n*2^j)\) dengan \(n\) adalah ukuran tabel Romberg yang bergantung pada fungsi dan batas toleransi serta nilai masukan, dan \(j\) bergantung pada \(n\).
 
