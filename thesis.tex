@@ -319,6 +319,94 @@ Dapat dilihat bahwa perbedaannya cukup kecil, dengan tingkat perbedaan pada angk
 
 \subsection{Toleransi Error}
 
+Error global pada metode komposit Simpson tidak dapat dihitung secara pasti dikarenakan aturan komposit bekerja dengan cara membagi integrasi ke dalam partisi yang didefinisikan pada awal program, yakni \(n = ceil((b-a)/tol\)\textasciicircum{}\((1/2))\). Maka, kita akan menggunakan penghitungan error dengan pendekatan error lokal per interval partisi.
+
+Berdasarkan referensi yang digunakan, rumus error dari metode Simpson adalah sebagai berikut.
+\begin{equation*}
+	\begin{split}
+		E(a,b) = -\frac{f^{(4)}(\xi)}{2880}(b-a)^{5}
+	\end{split}
+\end{equation*}
+
+Metode komposit Simpson bekerja dengan cara membagi integrasi ke dalam suatu jumlah partisi dengan ukuran interval yang sama, sehingga rumus error metode komposit Simpson dapat dibentuk dengan menjumlahkan error metode Simpson sebanyak \emph{n} sebagai jumlah partisi dimana titik \(a\) merupakan \(X_{i-1}\) dan titik \(b\) merupakan \(X_{i}\).
+\begin{equation*}
+	\begin{split}
+		\sum_{i=a}^{b}E(X_{i-1},X_{i}) = \sum_{i=a}^{b}-\frac{f^{(4)}(\xi)}{2880}(X_{i}-X_{i-1})^{5}
+	\end{split}
+\end{equation*}
+
+Berdasarkan contoh eksekusi pada bagian sebelumnya, kita dapat membuktikan hasil implementasi kita melalui perbandingan hasil dengan hasil komputasi integrasi aktual dari fungsi bawaan Octave.
+
+Fungsi pertama yang akan diuji adalah menggunakan fungsi \lstinline{quadgk}, yaitu fungsi integrasi dari Octave menggunakan algoritma \emph{adaptive Gauss-Konrod quadrature}. Menurut Octave, fungsi \lstinline{quadgk} memiliki karakteristik tingkat akurasi \emph{medium (1e-6 - 1e-9)} dengan \emph{smooth integrands}, menangani fungsi osilasi dan batas yang tak terbatas, dan memiliki tingkat akurasi yang lebih baik daripada fungsi integrasi satu variabel lain seperti \lstinline{quad, quadv, dan quadl}. Karakteristik-karakteristik fungsi \lstinline{quadgk} yang telah disebutkan sebelumnya menjadi alasan kami untuk menggunakan fungsi ini sebagai referensi.
+
+Perbandingan ini diimplementasikan sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+printf("\nHasil Integrasi dengan quadgk\n\n")
+[qAns, err] = quadgk(@z_norm_dist, low, high)
+		
+printf("\nError dengan Hasil Integrasi melalui quadgk\n")
+err1 = abs(qAns - res);
+err2 = abs(qAns - ansMinInf);
+printf("\nP(a <= Z <= b): %d", err1)
+printf("\nP(Z <= b) - P(Z <= a): %d", err2)
+	\end{lstlisting}
+\end{center}
+
+Hasil yang dihasilkan dari implementasi di atas adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+Hasil Integrasi dengan quadgk
+
+qAns = 0.839994848036913
+err = 5.904228928682587e-14
+		
+Error dengan Hasil Integrasi melalui quadgk
+
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+	\end{lstlisting}
+\end{center}
+
+Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{quadgk} memiliki akurasi dan error dalam tingkat \lstinline{1e-14} sehingga dapat dikatakan cukup akurat. Pada implementasi metode komposit Simpson, diberikan spesifikasi batas toleransi \lstinline{1e-7}. Namun, tingkat perbedaan yang menunjukan error berada pada derajat 7 atau \lstinline{1e-07} untuk cara integrasi secara langsung dan derajat 5 atau \lstinline{1e-05} untuk cara integrasi dengan memecah integrasi menjadi \(P(Z \le b ) - P(Z \le a )\). Hal ini menandakan bahwa implementasi integrasi secara langsung memiliki akurasi yang lebih baik daripada implementasi integrasi secara terpisah, namun melebihi batas toleransi yang ditentukan sehingga kurang akurat dibandingkan hasil integrasi dengan fungsi \lstinline{quadgk}.
+
+Selain fungsi \lstinline{quadgk}, Octave juga memberikan fungsi untuk menghitung fungsi distribusi normal yang ditugaskan kepada kami, yaitu fungsi \lstinline{normcdf}. Implementasi perbandingan menggunakan fungsi \lstinline{normcdf} adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+printf("\n\nHasil Integrasi dengan normcdf\n\n")
+cdf = normcdf([low high]);
+cdfAns = cdf(2) - cdf(1)
+		
+printf("\nError dengan Hasil Integrasi melalui normcdf\n")
+err1 = abs(cdfAns - res);
+err2 = abs(cdfAns - ansMinInf);
+printf("\nP(a <= Z <= b): %d", err1)
+printf("\nP(Z <= b) - P(Z <= a): %d", err2)
+	\end{lstlisting}
+\end{center}
+
+Hasil yang dihasilkan dari implementasi di atas adalah sebagai berikut.
+
+\begin{center}
+	\begin{lstlisting}[language=Octave]
+Hasil Integrasi dengan normcdf
+
+cdfAns = 0.839994848036913
+
+Error dengan Hasil Integrasi melalui normcdf
+
+P(a <= Z <= b): 9.3425e-07
+P(Z <= b) - P(Z <= a): 4.86772e-05
+	\end{lstlisting}
+\end{center}
+
+Dari hasil yang dihasilkan di atas, dapat dilihat bahwa hasil integrasi dengan fungsi \lstinline{normcdf} memiliki hasil yang sama persis dengan hasil integrasi dengan fungsi \lstinline{quadgk}. Dapat disimpulkan pula bahwa fungsi \lstinline{quadgk} sudah cukup akurat dan sesuai dengan fungsi distribusi normal pada Octave, yaitu \lstinline{normcdf}.
+
+Hasil error yang dihasilkan oleh kedua cara metode komposit Simpson ternyata kurang akurat dibandingkan hasil komputasi integrasi aktual dari fungsi bawaan Octave. Secara prinsip, akurasi aturan komposit dapat ditinggikan dengan menaikkan jumlah partisi yang dibuat untuk melakukan komputasi. Namun, hal ini dapat membuat kompleksitas algoritma semakin rumit sehingga \emph{running time} komputasi akan semakin lama.
+
 % intinya ntar hitung lewat normcdf terus state kalau err > tol sehingga kurang akurat, prinsip si komposit kalau mau lebih akurat = naikin nilai partisinya tapi risikonya kompleksitas semakin rumit sehingga running time akan semakin lama.
 
 \subsection{Analisis Kompleksitas}
