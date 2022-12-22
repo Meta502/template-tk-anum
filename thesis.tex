@@ -434,7 +434,7 @@ Terlihat bahwa fungsi \emph{parametric spline} dapat menghasilkan \emph{outline}
 \section{Kompleksitas Algoritma}
 \subsection{Kompleksitas Kalkulasi Koefisien}
 \lstinputlisting{assets/codes/getSplineCoeff.m}
-Asumsikan bahwa \(n\) adalah jumlah pasangan \(x, y\) yang dimasukkan ke fungsi. Parhatikan bahwa pada fungsi yang membuat matriks persamaan, terdapat pemanggilan \emph{floating point operation} sebanyak:
+Asumsikan bahwa \(n\) adalah jumlah pasangan \(x, y\) yang dimasukkan ke fungsi. Perhatikan bahwa pada fungsi yang membuat matriks persamaan, terdapat pemanggilan \emph{floating point operation} sebanyak:
 \begin{equation}
 	Pengurangan = \sum_{i=2}^{n-1} 8 = 8(n-1) - 8(2) = 8n-24
 \end{equation}
@@ -454,7 +454,38 @@ Namun, karena matriks permasalahan yang dihasilkan oleh problem ini sudah pasti 
 	Total = O(n) + 11n - 33
 \end{equation}
 
-\subsection{Kompleksitas Parametric Spline}
+\subsection{Kompleksitas Fungsi Interpolant}
+\lstinputlisting{assets/codes/naturalSpline.m}
+Asumsikan bahwa m adalah jumlah titik yang akan di-interpolasi oleh fungsi \emph{natural spline}. Perhatikan bahwa pada fungsi tersebut, terdapat pemanggilan \emph{floating point operation} sebanyak:
+\begin{equation}
+	Penjumlahan = \sum_{n=0}^{m} 1 = m
+\end{equation}
+\begin{equation}
+	Pengurangan = \sum_{n=0}^{m} 15 = 15m
+\end{equation}
+\begin{equation}
+	Perkalian = \sum_{n=0}^{m} 5 = 5m
+\end{equation}
+\begin{equation}
+	Pembagian = \sum_{n=0}^{m} 3 = 3m
+\end{equation}
+Maka, jumlah \emph{floating point opeartion} keseluruhan dari fungsi interpolasi diatas adalah:
+\begin{equation}
+	Total = Penjumlahan + Pengurangan + Perkalian + Pembagian = 24m
+\end{equation}
+
+\subsection{Kompleksitas Fungsi Parametric Spline}
+Agar perhitungan \emph{floating point operation} dapat dilakukan dengan lebih mudah, maka fungsi parametric spline yang diberikan diatas kami rubah menjadi bentuk yang lebih sederhana yakni:
+\lstinputlisting{assets/codes/simplifiedParametric.m}\
+Berdasarkan perhitungan \emph{floating point operation} yang telah dilakukan pada bagian sebelumnya, dan asumsi bahwa \(m = \frac{n}{0.1} = 10n\), maka kompleksitas akhir dari fungsi \emph{paramateric spline} yang telah dibuat adalah:
+\begin{equation}
+	\begin{split}
+		Total & = 2 \times Coefficient + 2 \times Spline\\
+		& = O(n^3) + 22n - 66 + 480n\\
+		& = O(n^3) + 502n - 66
+	\end{split}
+\end{equation}
+
 
 \section{Kesimpulan}
 Kesimpulan disini.
