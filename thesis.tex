@@ -358,7 +358,7 @@ Penulis akan menggunakan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} yan
 
 \subsection{Implementasi Menggunakan Octave}
 
-Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, penulis dapat menyusun sebuah algoritma pada MATLAB/Octave yaitu fungsi \emph{TrapezoidAdaptive} yang merupakan fungsi untuk pemanggilan rekursif setiap kali terjadinya pemecahan interval karena pendekatan yang masih belum mencapai batas kriteria TOL. Disusun sebagai berikut:
+Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, penulis dapat menyusun sebuah algoritma pada MATLAB/Octave yaitu fungsi \emph{Trapezoid Adaptive} yang merupakan fungsi untuk pemanggilan rekursif setiap kali terjadinya pemecahan interval karena pendekatan yang masih belum mencapai batas kriteria TOL. Disusun sebagai berikut:
 \begin{center}
 	\begin{lstlisting}[language=Octave]
 		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
@@ -450,25 +450,34 @@ Dengan tingkat perbedaan pada angka \lstinline{1e-07}, penulis dapat mengatakan 
 
 \subsection{Toleransi Error}
 
-\emph{Adaptive Method} dengan aturan Trapezoid dan aturan titik tengah akan mengatur pembagian subinterval menyesuaikan fungsi yang diintegrasi pada interval tertentu dan kebutuhan akurasi. Karena dilakukan untuk setiap subinterval, eror global tidak diketahui dan dibutuhkan pendekatan eror yang diketahui bahwa kita dapat mengatur nilai eror adalah
-
+Diketahui bentuk dari aturan \emph{Trapezodial} \(S[a,b]\) pada interval \([a,b]\), yaitu:
 \begin{equation*}
 	\begin{split}
-		E  = \frac{T(f) - M(f)}{3}
+		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^(3)\frac{f^{''}(c_2)}{12}
 	\end{split}
 \end{equation*}
 
-Adapun diketahui bentuk dari \emph{composite trapezoidal rule}, yaitu:
+dengan \lstinline{a < c_0 < b} dimana \lstinline{h = b - a} dimana variabel c yakni nilai tengah antara variabel a dan b. Dengan begitu untuk kedua interval yang dipisah menjadi dua tersebut digambarkan dengan rumus:
 \begin{equation*}
 	\begin{split}
-		\int_{a}^{b} f(x) \,dx & = \frac{h}{2}[y_0+y_m+2\sum_{j=1}^{m-1}f(y_i)]-\frac{(b-a)h^2}{12}f^(2)(c)
+		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^(3)\frac{f^{''}(c_1)}{12} + S_{[c,b]} - \frac{h^(3)}{8}\frac{f^{''}(c_2)}{12} \\
+		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} + S_{[c,b]} - \frac{h^(3)}{4} \frac{f^{''}(c_3)}{12}
 	\end{split}
 \end{equation*}
 
-Dari sini kita bisa lihat bahwa \emph{trapezoidal rule} mencapai batas akurasi paling tinggi berupa \(O(^2)\). Dengan jika komputasi batas E terlalu besar dan tidak mencapai kriteria, maka interval dapat dipecah dari \([a,b]\) menjadi \([a,c]\) dan \([c,b]\) dengan \emph{c} adalah nilai tengah kedua batas integral.
-Operasi interasi tersebut akan diulangi hingga besar E memenuhi batas yag dikehendaki.
+Dengan begitu \emph{Adaptive Method} dengan aturan Trapezoid dan aturan titik tengah akan mengatur pembagian sub-interval menyesuaikan fungsi yang diintegrasi pada interval tertentu dan kebutuhan akurasi. Karena dilakukan untuk setiap subinterval, eror global tidak diketahui dan dibutuhkan pendekatan eror yang diketahui bahwa kita dapat mengatur nilai eror yang digambarkan sebagai berikut:
+\begin{equation*}
+	\begin{split}
+		S_{[a,b]} - (S_{[a,c]} + S_{[c,b]})  = -\frac{h^(3)}{4}\frac{f^{''}(c_3)}{12} + h^(3)\frac{f^{''}(c_0)}{12} \\
+		\approx \frac{3}{4} h^(3)\frac{f^{''}(c_3)}{12}
+	\end{split}
+\end{equation*}
+
+Dengan pengurangan hasil aproksimasi pemecahan kedua interval pendekatan integral di atas, maka aproksimasi eror sekarang dapat dihitung. Dari penjabaran di atas dilihat bahwa interval \(S[a,b]\) - (\(S[a,c]\) + \(S[c,b]\)) diaproksimasi sebanyak 3 kali untuk sebuah interval \(S[a,c]\) + \(S[c,b]\) dalam \([a,b]\). Maka pemeriksaan akan dilakukan dari rumus sebelumnya apakah hasil aproksimasi bernilai kurang dari 3 kali (hasil 3 kali pemanggilan aproksimasi) dari TOL.
+
+Menurut referensi, jika kondisi tidak memenuhi maka pemecahan interval menjadi 2 bagian akan terus dilakukan dan hal tersebut diikuti dengan besar eror yang semakin mengecil sebanyak \(2^3 = 8\). Sehingga angka tolerance awal dapat dipastikan bernilai lebih besar dari hasil eror karena hal ini selaras dengan semakin banyak pemecahan interval yang terjadi.
+
 Dengan begitu kombinasi aturan eror pada dua tingkat metode trapezoid untuk \emph{Adaptive Method} adalah sebagai berikut:
-
 \begin{equation*}
 	\begin{split}
 		T_{h}(f) & = I(f) + O(h^2) \\
@@ -476,122 +485,99 @@ Dengan begitu kombinasi aturan eror pada dua tingkat metode trapezoid untuk \emp
 	\end{split}
 \end{equation*}
 
-(tolong bantuin gua toleransi error aijfhijdiadj)
-
-
 
 Pembuktian melalui eksekusi percobaan pada bagian sebelumnya, penulis membandingkan hasil aproksimasi dengan pendekatan metode Adaptive dengan nilai aktual integrasi melalui beberapa fungsi bawaan Octave dan metode pencocokan dengan nilai probabilitas tabel-Z yang sesungguhnya.
+\begin{enumerate}
+	\item
+	      Percobaan dengan fungsi \lstinline{quadgk}, yang merupakan fungsi integrasi Octave dengan algoritma \emph{adaptive Gauss-Konrod quadrature}.\lstinline{Quadgk} tergolong ke dalam fungsi yang memiliki \emph{Medium accuracy (1e-6 - 1e-9) with smooth integrands}. Fungsi ini menangani fungsi yang osilasi dan dengan batas integrasi tak hingga seperti pada persoalan di atas. Implementasi perbandingan hasil integrasi aproksimasi interval \([-1,1]\) pengerjaan dan \lstinline{quadgk} adalah sebagai berikut:
 
-1. Percobaan dengan fungsi \lstinline{quadgk}, yang merupakan fungsi integrasi Octave dengan algoritma \emph{adaptive Gauss-Konrod quadrature}.\lstinline{Quadgk} tergolong ke dalam fungsi yang memiliki \emph{Medium accuracy (1e-6 - 1e-9) with smooth integrands}. Fungsi ini menangani fungsi yang osilasi dan dengan batas integrasi tak hingga seperti pada persoalan di atas. Implementasi perbandingan hasil integrasi aproksimasi interval \([-1,1]\) pengerjaan dan \lstinline{quadgk} adalah sebagai berikut:
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-		[quadAns, err] = quadgk(@func, a, b)
-		err_quad = abs(quadAns-approx);
-		err_quad_ab = abs(quadAns-integ);
-		printf("----------")
-		printf("\nHasil Aktual dengan Metode Quadgk: %d\n", quadAns)
-		printf("\nEror P(Z <= b) - P(Z <= a)  Vs. Metode Quadgk: %d\n", err_quad)
-		printf("\nEror P(a <= Z <= b) Vs. Metode Quadgk: %d\n", err_quad_ab)
-	\end{lstlisting}
-\end{center}
+	      \begin{lstlisting}[language=Octave]
+				[quadAns, err] = quadgk(@func, a, b)
+				err_quad = abs(quadAns-approx);
+				err_quad_ab = abs(quadAns-integ);
+				printf("----------")
+				printf("\nHasil Aktual dengan Metode Quadgk: %d\n", quadAns)
+				printf("\nEror P(Z <= b) - P(Z <= a)  Vs. Metode Quadgk: %d\n", err_quad)
+				printf("\nEror P(a <= Z <= b) Vs. Metode Quadgk: %d\n", err_quad_ab)
+			\end{lstlisting}
 
-dengan hasil sebagai berikut
+	      dengan hasil sebagai berikut
 
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-		Hasil Aktual dengan Metode Quadgk: 
-		quadAns = 0.682689492137086
-		err = 4.795122632295090e-14  
+	      \begin{lstlisting}[language=Octave]
+				Hasil Aktual dengan Metode Quadgk: 
+				quadAns = 0.682689492137086
+				err = 4.795122632295090e-14  
+		
+				Eror P(Z <= b) - P(Z <= a)  Vs. Metode Quadgk: 1.123183701601249e-08
+				Eror P(a <= Z <= b) Vs. Metode Quadgk: 3.181731833556967e-07
+			\end{lstlisting}
 
-		Eror P(Z <= b) - P(Z <= a)  Vs. Metode Quadgk: 1.123183701601249e-08
-		Eror P(a <= Z <= b) Vs. Metode Quadgk: 3.181731833556967e-07
-	\end{lstlisting}
-\end{center}
+	      \lstinline{Quadgk} memiliki akurasi dan error \lstinline{1e-14} yang terbilang cukup akurat dan memiliki perbedaan akurasi dengan hasil aproksimasi sebanyak \lstinline{1e-7} dan \lstinline{1e-8}. Hal ini membuktikan aproksimasi dengan metode Adaptive yang menerapkan aturan Trapezoid masih memiliki perbedaan akurasi yang lumayan, tetapi tidak dapat dikatakan buruk. Hal ini juga bergantung pada nilai besar TOL yang ditentukan.
 
-\lstinline{Quadgk} memiliki akurasi dan error \lstinline{1e-14} yang terbilang cukup akurat dan memiliki perbedaan akurasi dengan hasil aproksimasi sebanyak \lstinline{1e-7} dan \lstinline{1e-8}. Hal ini membuktikan aproksimasi dengan metode Adaptive yang menerapkan aturan Trapezoid masih memiliki perbedaan akurasi yang lumayan, tetapi tidak dapat dikatakan buruk. Hal ini juga bergantung pada nilai besar TOL yang ditentukan.
+	\item
+	      Percobaan dengan fungsi \lstinline{normcdf} yang merupakan suatu fungsi distribusi normal. Dengan begitu membandingkan hasil aproksimasi metode ini dengan \lstinline{normcdf} akan dirasa lebih akurat dengan membandingkannya pada fungsi distribusi normal langsung.
+	      \begin{lstlisting}[language=Octave]
+				cdf = normcdf([a b]);
+				cdf_ans = cdf(2) - cdf(1);
+				err_cdf = abs(cdf - approx);
+				err_cdf_ab = abs(cdf - integ);
 
+				printf("----------")
+				printf("\nHasil NormCDF for Z value (Actual Value)\n: %d", cdf_ans)
+				printf("\nEror P(Z <= b) - P(Z <= a)  Vs. Metode NormCDF: %d\n", err_cdf)
+				printf("\nEror P(a <= Z <= b) Vs. Metode NormCDF: %d\n", err_cdf_ab)
+			\end{lstlisting}
 
-2. Percobaan dengan fungsi \lstinline{normcdf} yang merupakan suatu fungsi distribusi normal. Dengan begitu membandingkan hasil aproksimasi metode ini dengan \lstinline{normcdf} akan dirasa lebih akurat dengan membandingkannya pada fungsi distribusi normal langsung.
+	      dengan hasil sebagai berikut
 
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-		cdf = normcdf([a b]);
-		cdf_ans = cdf(2) - cdf(1);
-		err_cdf = abs(cdf - approx);
-		err_cdf_ab = abs(cdf - integ);
+	      \begin{lstlisting}[language=Octave]
+				Hasil NormCDF for Z value (Actual Value): 0.682689492137086
+				Eror P(Z <= b) - P(Z <= a)  Vs. Metode NormCDF: 1.123183690499019e-08
+				Eror P(a <= Z <= b) Vs. Metode NormCDF: 3.181731832446744e-07
+			\end{lstlisting}
 
-		printf("----------")
-		printf("\nHasil NormCDF for Z value (Actual Value)\n: %d", cdf_ans)
-		printf("\nEror P(Z <= b) - P(Z <= a)  Vs. Metode NormCDF: %d\n", err_cdf)
-		printf("\nEror P(a <= Z <= b) Vs. Metode NormCDF: %d\n", err_cdf_ab)
-	\end{lstlisting}
-\end{center}
-
-dengan hasil sebagai berikut
-
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-		Hasil NormCDF for Z value (Actual Value): 0.682689492137086
-		Eror P(Z <= b) - P(Z <= a)  Vs. Metode NormCDF: 1.123183690499019e-08
-		Eror P(a <= Z <= b) Vs. Metode NormCDF: 3.181731832446744e-07
-	\end{lstlisting}
-\end{center}
-
-Keluaran perbandingan nilai aproksimasi integrasi percobaan ini dengan fungsi \lstinline{quadgk} dan \lstinline{normcdf} memiliki besar perbedaan nilai
-yang hampir serupa di atas yaitu untuk \(P(a \le Z \le b)= 1.123183690499019e-08\)  dan \(P(Z \le b ) - P(Z \le a ) = 3.181731832446744e-07\).
-Dengan begitu dapat dikatakan fungsi aproksimasi dengan metode
-Adaptive Trapezoid ini sudah cukup akurat menyesuaikan dengan fungsi bawaan Octave yaitu \lstinline{quadgk} dan utamanya \lstinline{normcdf} yang merupakan fungsi distribusi normal.
+	      Keluaran perbandingan nilai aproksimasi integrasi percobaan ini dengan fungsi \lstinline{quadgk} dan \lstinline{normcdf} memiliki besar perbedaan nilai
+	      yang hampir serupa di atas yaitu untuk \(P(a \le Z \le b)= 1.123183690499019e-08\)  dan \(P(Z \le b ) - P(Z \le a ) = 3.181731832446744e-07\).
+	      Dengan begitu dapat dikatakan fungsi aproksimasi dengan metode
+	      Adaptive Trapezoid ini sudah cukup akurat menyesuaikan dengan fungsi bawaan Octave yaitu \lstinline{quadgk} dan utamanya \lstinline{normcdf} yang merupakan fungsi distribusi normal.
+\end{enumerate}
 
 Percobaan di atas jika dijalankan dengan serangkaian TOL yang berbeda juga akan menghasilkan hasil error pembanding dengan \lstinline{quadgk} dan \lstinline{normcdf} di atas, digambarkan pada grafik di bawah.
-(Percobaan dengan interval \([0,0.01]\))
+(Percobaan dengan interval \([0,0.01]\)) \newpage
+
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.5\textwidth]{trapezoid graf.jpg}
+	\includegraphics[width=0.5\textwidth]{plot baru adaptive.jpg}
 	\caption{Grafik Nilai Eror Hasil Komputasi Adaptive dengan fungsi bawaan (quadgk dan normcdf)}
 	\label{fig:difGraphAdaptive}
 \end{figure}
 
-Dengan begitu percobaan aproksimasi metode Adaptive dengan aturan Trapezoid mengeluarkan hasil yang sesuai dan memiliki akurasi yang sesuai serta menyesuaikan dengan TOL eror yang diberikan. Hasil komputasi juga sesuai atau mendekati dengan fungsi distribusi normal dan hasil integrasi aktual fungsi bawaan.
+Dengan begitu percobaan aproksimasi metode Adaptive dengan aturan Trapezoid mengeluarkan hasil yang sesuai dan memiliki akurasi yang sesuai serta menyesuaikan dengan TOL eror yang diberikan. Hasil komputasi juga sesuai atau mendekati dengan fungsi distribusi normal dan hasil integrasi aktual fungsi bawaan. Diperlihatkan juga dengan plot eror di atas yang fungsinya semakin mendekati nol.
 
 \subsection{Analisis Kompleksitas}
-Berikut dilakukan perhitungan FLOP (\emph{floating-point operatons}) pada implementasi kode.
+Berikut dilakukan perhitungan FLOP (\emph{floating-point operations}) pada implementasi kode.
 
-\begin{center}
-	\begin{lstlisting}[language=Octave]
-if tol < 1e-14
-	printf("Tolerance is too small and will produce errors, please use larger values\n")
-	res = 0;
-	return;
-endif
-
-n = 100;
-R = zeros(n, n);
-R(1,1) = (b-a)*(f(a)+f(b))/2;
-	\end{lstlisting}
-\end{center}
-
-Di sini, terdapat 5 FLOPs yang terjadi, yaitu pada kondisi toleransi, dan inisiasi elemen pertama \\ \lstinline{R(1,1)}. Lanjut analisis ke dalam \emph{loop}
 \begin{center}
 	\begin{lstlisting}[language=Octave]
 		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
-			c = (a+b)/2;      % evaluate f in midpoint
-			fa = f(a); fb = f(b); fc = f(c);
+		c = (a+b)/2;      % evaluate f in midpoint
+		fa = f(a); fb = f(b); fc = f(c);
 
-			Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
-			Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
-			Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
+		Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
+		Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
+		Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
 
-			if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
-				Q = Q2+Q3;   %accept trapezoid rule value
-			else
-				Q = TrapezoidAdaptive(f,a,c,Tol/2,ori) + TrapezoidAdaptive(f,c,b,Tol/2,ori);
-				% use algorithm for [a,c] and [c,b]
-			end
+		if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
+			Q = Q2+Q3;   %accept trapezoid rule value
+		else
+			Q = TrapezoidAdaptive(f,a,c,Tol/2,ori) + TrapezoidAdaptive(f,c,b,Tol/2,ori);
+			% use algorithm for [a,c] and [c,b]
 		end
+	end
 	\end{lstlisting}
 \end{center}
 
-(belum analisis kompleksitas algoritma)
+\emph{Adaptive quadrature} merupakan metode aproksimasi fungsi integrasi yang rekursif dengan setiap kondisi yang belum memenuhi akan membagi \emph{problem} menjadi 2 buah \emph{sub-problem}. Perhitungan kompleksitas berikut ini akan dihitung dengan menghitung \emph{function call}. Untuk setiap pemanggilan fungsi di atas dilakukan 3 \emph{function call} untuk mendapatkan \emph{f(a), f(b), f(c)}. Untuk tiap pemecahan
 
 \section{Implementasi Algoritma Romberg}
 
