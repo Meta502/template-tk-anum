@@ -15,15 +15,25 @@
 \usepackage[justification=centering]{caption}
 \usepackage[numbered,framed]{matlab-prettifier}
 \usepackage[export]{adjustbox}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
 
 \graphicspath{ {./assets/pics} }
 
 \hyphenation{op-tical net-works semi-conduc-tor} % Corrects some bad hyphenation 
-\lstset{
-  basicstyle=\ttfamily,
-  columns=fullflexible,
-  breaklines=true,
-  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+\lstset{language=Matlab,%
+	basicstyle=\ttfamily,
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
 }
 
 
@@ -73,7 +83,7 @@ Output yang diharapkan dari fungsi tersebut adalah sebuah kurva parametrik  meng
 		\centering
 		\includegraphics[max size={\textwidth/2}{\textheight}]{soal1-tc1}
 		\caption{Contoh Graf Interpolasi \#1}
-		\label{fig_sim2}
+		\label{fig_tc1}
 	\end{figure}
 	\columnbreak
 	\begin{figure}[H]
@@ -140,7 +150,7 @@ Kami akan menggunakan pendekatan \emph{bottom-up} untuk membangun algoritma Natu
 
 Asumsikan bahwa:
 \begin{itemize}
-	\item Kita memiliki suatu himpunan berisi \(n\) titik data \((x_i, y_i)\) dimana \(x_1 < x_2 < \dots < x_n\)
+	\item Terdapat suatu himpunan berisi \(n\) titik data \((x_i, y_i)\) dimana \(x_1 < x_2 < \dots < x_n\)
 	\item \(f(x)\) adalah polinomial dengan derajat \(\leq 3\) pada setiap subinterval \([x_i, x_{i + 1}]\)
 	\item \(f(x)\), \(f'(x)\), \(f''(x)\) adalah fungsi kontinu untuk interval \(a \leq x \leq b\) sehingga:
 	      \begin{itemize}
@@ -154,41 +164,297 @@ Asumsikan bahwa:
 Dengan asumsi tersebut, kita dapat mulai membangun fungsi interpolant \(f_{i, i+1}(x)\) dengan asumsi fungsi tersebut adalah sebuah fungsi kubik. Karena fungsi tersebut merupakan suatu fungsi derajat tiga, maka turunan keduanya pada suatu \(x\) merupakan sebuah fungsi linear.
 
 Ingat bahwa sebuah fungsi linear yang menginterpolasi 2 titik dapat dicari menggunakan basis Lagrange, sehingga kita dapat mendefinisikan \(S''(x)\) sebagai berikut:
-\begin{equation*}
+\begin{equation}
 	f''_{i, i+1}(x) = k_i\frac{x-x_{i + 1}}{x_i - x_{i + 1}} + k_{i+1}\frac{x - x_i}{x_{i + 1} - x_i}
-\end{equation*}
+\end{equation}
 
 Selanjutnya, kita dapat melakukan integrasi pada fungsi tersebut untuk mendapatkan \(f_{i, i+1}'(x)\) dan \(f_{i, i+1}(x)\).
-\begin{equation*}
+\begin{equation}
 	\begin{split}
 		f_{i, i+1}'(x) & = \int f_{i, i+1}''(x) dx\\
 		& = \int (k_i\frac{x-x_{i + 1}}{x_i - x_{i + 1}} + k_{i+1}\frac{x - x_i}{x_{i + 1} - x_i})dx\\
 		& = \frac{k_i(x-x_{i+1})^2}{2(x_i-x_{i+1})} + \frac{k_{i+1}(x-x_{i})^2}{2(x_{i+1}-x_{i})} + C
 	\end{split}
-\end{equation*}
-\begin{equation*}
+\end{equation}
+\begin{equation}
 	\begin{split}
 		f_{i, i+1}(x) & = \int f_{i, i+1}'(x) dx\\
 		& = \int (\frac{k_i(x-x_{i+1})^2}{2(x_i-x_{i+1})} + \frac{k_{i+1}(x-x_{i})^2}{2(x_{i+1}-x_{i})} + C)dx\\
 		& = \frac{k_i(x-x_i)^3}{6(x_i - x_{i+1})} + \frac{k_{i+1}(x - x_i)^3}{6(x_{i+1} - x_i)} + Cx + D
 	\end{split}
-\end{equation*}
+\end{equation}
 
 Setelah mendapatkan fungsi \(f(x)\) dan \(f'(x)\), kita harus selanjutnya mencari nilai dari suku C dan D agar dapat menggunakan fungsi tersebut sebagai interpolant.
-\begin{equation*}
-	\begin{split}
-		C & = A - B\\
-		D & = -Ax_{i+1} + Bx_i
-	\end{split}
-\end{equation*}
+\begin{equation}
+	C = A - B\\
+\end{equation}
+\begin{equation}
+	D = -Ax_{i+1} + Bx_i
+\end{equation}
 
 Sehingga kita akan mendapatkan,
-\begin{equation*}
+\begin{equation}
 	\begin{split}
 		f_{i, i+1}(x) & = \frac{k_i(x-x_i)^3}{6(x_i - x_{i+1})} + \frac{k_{i+1}(x - x_i)^3}{6(x_{i+1} - x_i)} + (A-B)x - Ax_{i+1} + Bx_i\\
 		& = \frac{k_i(x-x_i)^3}{6(x_i - x_{i+1})} + \frac{k_{i+1}(x - x_i)^3}{6(x_{i+1} - x_i)} + A(x-x_{i+1}) - B(x-x_i)
 	\end{split}
+\end{equation}
+
+Selanjutnya kita dapat menggunakan syarat-syarat dari fungsi \(S(x)\) untuk menemukan A dan B yang dapat menyelesaikan rumus diatas.
+
+\begin{itemize}
+	\item
+	      \(f_{i, i+1}(x_i) = y_i\)
+
+	      Apabila kita mengsubstitusi syarat ini ke persamaan diatas, maka kita akan mendapatkan:
+	      \begin{equation*}
+		      y_i = \frac{k_i(x_i - x_{i+1})^3}{6(x_i - x_{i+1})} + A(x_i - x_{i+1})
+	      \end{equation*}
+	      \begin{equation*}
+		      A(x_i - x_{i+1}) = y_i - \frac{k_i(x_i - x_{i+1})^3}{6(x_i - x_{i+1})}
+	      \end{equation*}
+	      \begin{equation}
+		      A = \frac{y_i}{x_i - x_{i+1}} - \frac{k_i}{6}(x_i - x_{i+1})
+	      \end{equation}
+
+	\item
+	      \(f_{i, i+1}(x_{i+1}) = y_{i+1}\)
+
+	      Apabila kita mengsubstitusi syarat ini ke persamaan diatas, maka kita akan mendapatkan:
+	      \begin{equation*}
+		      y_{i+1} = B(x_{i+1} - x_i) - \frac{k_{i+1}(x_{i+1}-x_i)^3}{6(x_i - x_{i + 1})}
+	      \end{equation*}
+	      \begin{equation*}
+		      \begin{split}
+			      B(x_{i+1} - x_i) & = y_{i+1} + \frac{k_{i+1}(x_{i+1}-x_i)^3}{6(x_i - x_{i + 1})}\\
+			      & = y_{i+1} - \frac{k_{i+1}(x_{i+1}-x_i)^3}{6(x_{i + 1} - x_i)}
+		      \end{split}
+	      \end{equation*}
+	      \begin{equation}
+		      B = \frac{y_{i+1}}{(x_i - x_{i+1})} - \frac{k_{i+1}}{6}(x_i - x_{i+1})
+	      \end{equation}
+\end{itemize}
+
+Setelah mendapatkan \(A\) dan \(B\) kita dapat mengsubstitusikan kembali suku-suku tersebut ke \(f_{i, i+1}(x)\) untuk mendapatkan:
+\begin{equation}
+	\begin{split}
+		f_{i, i+1}(x) & = \frac{k_i}{6}[\frac{x-x_{i+1}^3}{x_i-x_{i+1}} - (x - x_{i+1})(x_i - x_{i+1})]\\
+		& - \frac{k_{i+1}}{6}[\frac{(x-x_i)^3}{x_i - x_{i+1}} - (x-x_i)(x_i - x_{i+1})]\\
+		& + \frac{y_i(x-x_{i+1}) - y_{i+1}(x-x_i)}{x_i - x_{i+1}}
+	\end{split}
+\end{equation}
+
+Selanjutnya kita harus mencari vektor \(k\) yang dapat digunakan untuk menghitung nilai interpolasi. Ingat bahwa suatu fungsi spline harus memenuhi:
+\begin{equation*}
+	f_{i-1, i}'(x_i) = f_{i, i+1}'(x_i)
 \end{equation*}
+Dimana \(i = 2, 3, \dots, n-1\) karena diketahui bahwa \(k_i = k_n = 0\) berdasarkan \emph{natural boundary condition}. Maka kita akan mendapatkan persamaan sebagai berikut:
+\begin{equation*}
+	\begin{split}
+		f'_{i, i+1}(x_i) & = \frac{k_i}{6}[\frac{3(x-x_{i+1})^2}{x_i - x_{i+1}} - (x_i - x_{i+1})]\\
+		& - \frac{k_{i+1}}{6}[\frac{3(x-x_i)^2}{x_i - x_{i+1}} - (x_i - x_{i+1})]\\
+		& + \frac{y_i - y_{i+1}}{x_i - x_{i+1}}
+	\end{split}
+\end{equation*}
+
+\begin{equation*}
+	\begin{split}
+		f'_{i-1, i}(x_i) & = \frac{k_{i-1}}{6}[\frac{3(x-x_{i})^2}{x_{i-1} - x_{i}} - (x_{i-1} - x_{i})]\\
+		& - \frac{k_{i}}{6}[\frac{3(x-x_{i-1})^2}{x_{i-1} - x_{i}} - (x_{i-1} - x_{i})]\\
+		& + \frac{y_{i-1} - y_{i}}{x_{i-1} - x_{i}}
+	\end{split}
+\end{equation*}
+
+\begin{equation*}
+	\frac{k_i}{6}[\frac{3(x-x_{i+1})^2}{x_i - x_{i+1}} - (x_i - x_{i+1})] - \frac{k_{i+1}}{6}[\frac{3(x-x_i)^2}{x_i - x_{i+1}} - (x_i - x_{i+1})] + \frac{y_i - y_{i+1}}{x_i - x_{i+1}}
+\end{equation*}
+\begin{equation*}
+	=
+\end{equation*}
+\begin{equation*}
+	\frac{k_{i-1}}{6}[\frac{3(x-x_{i})^2}{x_{i-1} - x_{i}} - (x_{i-1} - x_{i})] - \frac{k_{i}}{6}[\frac{3(x-x_{i-1})^2}{x_{i-1} - x_{i}} - (x_{i-1} - x_{i})] + \frac{y_{i-1} - y_{i}}{x_{i-1} - x_{i}}
+\end{equation*}
+
+Menyelesaikan persamaan tersebut akan menghasilkan sistem persamaan linear sebagai berikut:
+\begin{equation}
+	k_{i-1}(x_{i-1} - x_i) + 2k_i(x_{i-1} - x_{i+1}) + k_{i+1}(x_i - x_{i+1}) = 6(\frac{y_{i-1}-y_i}{x_{i-1}-x_i} - \frac{y_i-y_{i+1}}{x_i - x_{i+1}})
+\end{equation}
+Kita dapat juga menyatakan persamaan ini sebagai sebuah persamaan matriks:
+\begin{multicols}{3}
+	\noindent
+	\begin{equation*}
+		c_i = x_{i-1} - x_i
+	\end{equation*}
+	\begin{equation*}
+		d_i = 2(x_{i-1} - x_{i+1})
+	\end{equation*}
+	\begin{equation*}
+		e_i = x_i - x_{i+1}
+	\end{equation*}
+\end{multicols}
+\begin{equation*}
+	\gamma_i = 6(\frac{y_{i-1}-y_i}{x_{i-1}-x_i} - \frac{y_i-y_{i+1}}{x_i - x_{i+1}})
+\end{equation*}
+\begin{equation}
+	\begin{bmatrix}
+		d_1 & e_1 &        &         &         &         \\
+		c_2 & d_2 & e_2    &         &         &         \\
+		    & c_3 & d_3    & e_3     &         &         \\
+		    &     & \ddots & \ddots  & \ddots  &         \\
+		    &     &        & c_{n-3} & d_{n-3} & e_{n-3} \\
+		    &     &        &         & c_{n-2} & d_{n-2} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+		k_1 \\k_2\\k_3\\\vdots\\k_{n-2}\\k_{n-1}
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		\gamma_1 \\\gamma_2\\\gamma_3\\\vdots\\\gamma_{n-2}\\\gamma_{n-1}
+	\end{bmatrix}
+\end{equation}
+
+\subsection{Membangun fungsi \((x(t), y(t))\)}
+Menggunakan perumusan umum untuk \emph{natural cubic spline} yang telah dibangun pada bagian sebelumnya, sekarang kita dapat mulai mendefinisikan fungsi parametrik \((x(t), y(t))\) yang akan menginterpolasi posisi sebuah objek pada suatu interval waktu tertentu. Asumsikan beberapa hal sebagai berikut ini akan selalu terpenuhi oleh input data yang diberikan:
+\begin{itemize}
+	\item \(|\vec{x}| = |\vec{y}| = N\) dimana \(N > 0\)
+	\item \(t_i\) adalah nilai yang merepresentasikan waktu, dimana \(0 \leq t_i \leq N\) dan \(t_i < t_{i+1}\)
+\end{itemize}
+Maka untuk setiap input \((x, y)\) yang diberikan, kita dapat mengasosiasikan sebuah nilai \(t\) dengan posisi \(x\) dan posisi \(y\) suatu benda pada detik tertentu. Maka, untung mendapatkan transisi yang halus diantara \((x, y)\) yang diketahui, kita dapat mendefinisikan \(x(t)\) sebagai fungsi yang menginterpolasi \(x\) pada suatu detik \(t\) dan \(y(t)\) sebagai fungsi yang menginterpolasi \(y\) pada suatu detik \(t\). Maka kita dapat mendefinisikan \emph{interpolated position} dari sebuah benda pada setiap waktu sebagai:
+\begin{equation*}
+	(x_{t'}, y_{t'}) = (x(t'), y(t')) = (f_{t_i, t_{i+1}}(t'), g_{t_i, t_{i+1}}(t'))
+\end{equation*}
+Dimana,
+\begin{itemize}
+	\item \(f_{t_i, t_{i+1}}(t')\) adalah fungsi yang menginterpolasi posisi \(x\) pada detik ke-\(t'\) dimana \(t_i \leq t' \leq t_{i+1}\)
+	\item \(g_{t_i, t_{i+1}}(t')\) adalah fungsi yang menginterpolasi posisi \(y\) pada detik ke-\(t'\) dimana \(t_i \leq t' \leq t_{i+1}\)
+\end{itemize}
+
+\subsection{Implementasi Fungsi Spline Parametrik Menggunakan MATLAB}
+\begin{enumerate}
+	\item
+	      \emph{Interpolating Function}
+	      \lstinputlisting{assets/codes/naturalSpline.m}
+	      \pagebreak
+	\item
+	      \emph{Determining \(k_i\)}
+	      \newline
+	      Proses penyelesaian SPL pada algoritma dibawah menggunakan \emph{built-in matrix solve} dari Octave/MATLAB, namun karena bentuk SPL akan berupa sebuah matriks tridiagonal, kita dapat juga menyelesaikannya dalam kompleksitas waktu \(O(n)\) dengan menggunakan \emph{Thomas algorithm}.
+	      \textbf{Code:}
+	      \lstinputlisting{assets/codes/getSplineCoeff.m}
+	      \pagebreak
+	\item
+	      \emph{Parametric Plotting Function}
+	      \newline
+	      Fungsi dibawah ini juga membuat \emph{graph} untuk nilai \(t\) terhadap \(x\) dan \(t\) terhadap \(y\).
+	      \lstinputlisting{assets/codes/parametricPlot.m}
+\end{enumerate}
+
+\section{Evaluasi Performa Fungsi Spline Parametrik}
+\subsection{Kasus I: Contoh Soal \#1}
+\begin{figure}[H]
+	\centering
+	\includegraphics[max size={\textwidth/2}{\textheight}]{soal1-tc1}
+	\caption{Contoh Soal \#1: Original}
+	\label{fig_tc1}
+\end{figure}
+Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik dengan contoh yang telah diberikan pada soal menghasilkan kurva sebagai berikut:
+\begin{figure}[H]
+	\centering
+	\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc1_curve}
+	\caption{Contoh Soal \#1: Function Output}
+	\label{fig_tc1_curve}
+\end{figure}
+Apabila dibandingkan dengan grafik hasil interpolasi yang diberikan pada soal, dapat dilihat bahwa kurva yang dihasilkan oleh fungsi interpolasi kami memiliki bentuk yang cukup identik dengan grafik asli. Hal ini menunjukkan bahwa algoritma \emph{parametric cubic spline} yang kami gunakan sudah cukup mendekati algoritma yang digunakan untuk membuat contoh pertama pada soal.
+
+Berikut ini merupakan output dari fungsi \(x(t)\) dan \(y(t)\) yang menghasilkan \emph{output} kurva diatas:
+\begin{multicols}{2}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc1_tx.png}
+		\caption{Grafik x(t) untuk Kasus I}
+		\label{fig_tc1_tx}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc1_ty.png}
+		\caption{Grafik y(t) untuk Kasus I}
+		\label{fig_tc1_ty}
+	\end{figure}
+\end{multicols}
+Perhatikan bahwa grafik yang dihasilkan merupakan grafik yang menginterpolasi titik \(t\) terhadap posisi dengan transisi yang cukup halus antara titik-titik pada interval yang sudah diketahui. Menurut kami hasil interpolasi ini sudah cukup memuaskan karena dapat menginterpolasi posisi benda secara baik untuk seluruh interval \(1 \leq t \leq length(position)\) tanpa mengalami diskontinuitas pada hasil interpolasinya.
+\subsection{Kasus II: Contoh Soal \#2}
+\begin{figure}[H]
+	\centering
+	\includegraphics[max size={\textwidth/2}{\textheight}]{soal1-tc2}
+	\caption{Contoh Soal \#2: Original}
+	\label{fig_tc2}
+\end{figure}
+Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik dengan contoh yang telah diberikan pada soal menghasilkan kurva sebagai berikut:
+\begin{figure}[H]
+	\centering
+	\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc2_curve}
+	\caption{Contoh Soal \#2: Function Output}
+	\label{fig_tc2_curve}
+\end{figure}
+\pagebreak
+\begin{multicols}{2}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc2_tx.png}
+		\caption{Grafik x(t) untuk Kasus II}
+		\label{fig_tc2_tx}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc2_ty.png}
+		\caption{Grafik y(t) untuk Kasus II}
+		\label{fig_tc2_ty}
+	\end{figure}
+\end{multicols}
+Sama seperti pada bagian sebelumnya, grafik kurva yang dihasilkan oleh fungsi yang telah kami buat memiliki bentuk yang sangat identik dengan contoh yang diberikan pada soal, sehingga kami menyimpulkan bahwa fungsi \emph{parametric spline} yang kami buat sudah memiliki performa yang cukup baik.
+
+\subsection{Kasus III: Amogus}
+Selain memiliki manfaat dalam menginterpolasi gerak dari suatu benda yang diketahui posisinya pada detik ke-\(t\), fungsi \emph{parametric spline} yang telah kami bangun dapat juga digunakan untuk melakukan \emph{tracing} pada suatu gambar arbitrer. Pada bagian ini, kami akan melakukan \emph{tracing} pada gambar \emph{meme "Amogus"} untuk mendemonstrasikan potensi aplikasi dari sebuah fungsi \emph{parametric spline}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[max size={\textwidth/2}{\textheight}]{amogus-original.jpg}
+	\caption{Amogus: Original}
+\end{figure}
+
+Untuk membuat suatu kurva yang mengaproksimasi bentuk dari gambar tersebut, kami melakukan pemanggilan fungsi dengan koordinat sebagai berikut:
+\lstinputlisting{assets/codes/amogus.m}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[max size={\textwidth/2}{\textheight}]{amogus_curve.png}
+	\caption{Amogus: Function Output}
+\end{figure}
+Terlihat bahwa fungsi \emph{parametric spline} dapat menghasilkan \emph{outline} gambar yang cukup identik dengan gambar asli yang diberikan diatas. Hal ini mendemonstrasikan salah satu aplikasi dari fungsi \emph{parametric spline} pada bidang \emph{computer graphics} dan \emph{digital art}.
+
+\section{Kompleksitas Algoritma}
+\subsection{Kompleksitas Kalkulasi Koefisien}
+\lstinputlisting{assets/codes/getSplineCoeff.m}
+Asumsikan bahwa \(n\) adalah jumlah pasangan \(x, y\) yang dimasukkan ke fungsi. Parhatikan bahwa pada fungsi yang membuat matriks persamaan, terdapat pemanggilan \emph{floating point operation} sebanyak:
+\begin{equation}
+	Pengurangan = \sum_{i=2}^{n-1} 8 = 8(n-1) - 8(2) = 8n-24
+\end{equation}
+\begin{equation}
+	Perkalian = \sum_{i=2}^{n-1} 1 = (n-1) - 1(2) = n - 3
+\end{equation}
+\begin{equation}
+	Pembagian = \sum_{i=2}^{n-1} 2 = 2(n-1) - 2(2) = 2n - 6
+\end{equation}
+Sehingga, dengan asumsi bahwa penyelesaian sistem persamaan akan memakan waktu \(O(n^3)\) (\emph{gaussian elimination}), maka fungsi koefisien akan memiliki kompleksitas sebesar:
+\begin{equation}
+	Total = O(n^3) + 11n - 33
+\end{equation}
+
+Namun, karena matriks permasalahan yang dihasilkan oleh problem ini sudah pasti merupakan matriks \emph{tridiagonal}, dimana elemen non-zero hanya dapat muncul di sebelah diagonal-nya, terdapat algoritma eliminasi yang dapat menyelesaikan persamaan dalam waktu \(O(n)\), yakni algoritma Thomas. Apabila kita asumsikan bahwa penyelesaian permasalahan matriks dilakukan dengan menggunakan algoritma tersebut, maka kompleksitas keseluruhan dari fungsi koefisien akan bernilai:
+\begin{equation}
+	Total = O(n) + 11n - 33
+\end{equation}
+
+\subsection{Kompleksitas Parametric Spline}
 
 \section{Kesimpulan}
 Kesimpulan disini.
