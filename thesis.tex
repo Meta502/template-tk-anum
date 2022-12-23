@@ -64,15 +64,15 @@
 \IEEEpeerreviewmaketitle
 
 \section{Pendahuluan}
-Interpolasi merupakan teknik yang digunakan untuk membangun suatu fungsi yang melewati sebuah himpunan titik-titik diskret yang diketahui. Fungsi interpolasi memiliki aplikasi yang luas pada ilmu komputer karena dapat digunakan untuk menggambarkan berbagai kurva kompleks dengan \emph{computational cost} yang relatif murah apabila dibandingkan dengan metode \emph{brute force} (mencari seluruh titik yang memenuhi suatu kurva secara \emph{exhaustive}). Interpolasi beberapa titik diskret dapat dicapai dengan berbagai metode interpolasi seperti interpolasi konstan, interpolasi linear, interpolasi polinomial, dan interpolasi \emph{spline} yang menjadi topik dari laporan ini.
+Interpolasi merupakan teknik yang digunakan untuk membangun suatu fungsi yang melewati sebuah himpunan titik-titik diskret yang diketahui. Fungsi interpolasi memiliki aplikasi yang luas pada ilmu komputer karena dapat digunakan untuk menggambarkan berbagai kurva kompleks dengan \emph{computational cost} yang relatif murah apabila dibandingkan dengan metode \emph{brute force} (mencari seluruh titik yang memenuhi suatu kurva secara \emph{exhaustive}). Interpolasi beberapa titik diskret dapat dicapai dengan berbagai metode interpolasi seperti interpolasi konstan, interpolasi linear, interpolasi polinomial, dan interpolasi \emph{spline} yang menjadi topik dari paper ini.
 
-Secara matematis, sebuah fungsi interpolasi dapat dinyatakan sebagai suatu fungsi \(P(x)\) dimana \(x\) adalah sebuah titik yang ingin diinterpolasi. Hasil dari fungsi tersebut adalah sebuah nilai yang merupakan aproksimasi dari nilai fungsi \(f(x)\) yang melewati seluruh titik-titik diskret yang nilainya sudah diketahui.
+Secara matematis, sebuah fungsi interpolasi dapat dinyatakan sebagai suatu fungsi \(P(x)\) di mana \(x\) adalah sebuah titik yang ingin diinterpolasi. Hasil dari fungsi tersebut adalah sebuah \emph{value} yang merupakan aproksimasi dari nilai fungsi \(f(x)\) yang melewati seluruh titik-titik diskret yang nilainya sudah diketahui.
 
-Pada laporan ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline}---atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural}---untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). \emph{Cubic spline} dapat didefinisikan sebagai suatu \emph{piecewise polynomial function} yang menginterpolasi sebuah himpunan titik dengan menggunakan sebuah \emph{cubic polynomial} sebagai fungsi dasarnya pada setiap interval.
+Pada \emph{paper} ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline}—atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural}—untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). Cubic spline dapat didefinisikan sebagai suatu \emph{piecewise polynomial function} yang menginterpolasi sebuah himpunan titik dengan menggunakan sebuah \emph{cubic polynomial} sebagai fungsi dasarnya pada setiap interval.
 
-Untuk sebuah input yang berisi \(n\) titik, akan terdapat \(n-1\) \emph{cubic function} yang menginterpolasi titik-titik tersebut di setiap interval. Pembangunan \emph{spline} ini sendiri akan dijelaskan secara lebih mendetail pada bagian selanjutnya. Fungsi \emph{natural cubic spline} ini kemudian akan digunakan sebagai basis untuk suatu fungsi parametrik \((x(t), y(t))\) yang mengambil suatu \emph{array} berisi \emph{time-step} dengan resolusi \(r\) dan menginterpolasi \((x, y)\) untuk input tersebut.
+Untuk sebuah input yang berisi \(n\) titik, akan terdapat \(n-1\) \emph{cubic function} yang menginterpolasi titik-titik tersebut di setiap interval. Pembangunan spline ini sendiri akan dijelaskan secara lebih mendetil pada bagian selanjutnya. Fungsi \emph{natural cubic spline} ini kemudian akan digunakan sebagai basis untuk suatu fungsi parametrik \((x(t), y(t))\) yang mengambil suatu \emph{array} berisi \emph{time-step} dengan resolusi \(r\) dan menginterpolasi (x, y) untuk input tersebut.
 
-Output yang diharapkan dari fungsi tersebut adalah sebuah kurva parametrik  menginterpolasi gerak titik seperti pada dua contoh dibawah ini:
+Output yang diharapkan dari fungsi tersebut adalah sebuah kurva parametrik menginterpolasi gerak titik seperti pada dua contoh berikut ini:
 
 \begin{multicols}{2}
 	\begin{figure}[H]
@@ -92,11 +92,11 @@ Output yang diharapkan dari fungsi tersebut adalah sebuah kurva parametrik  meng
 
 \pagebreak
 
-\section{Membangun fungsi (x(t), y(t))}
+\section{Membangun Fungsi (x(t), y(t))}
 Pada bagian ini, kami akan membangun fungsi parametrik \((x(t), y(t))\) yang dapat menghasilkan output yang diharapkan dari tugas kali ini.
 
 \subsection{Definisi Cubic Spline}
-Apabila diberikan \(n + 1\) titik data \(x_i, y_i\), dimana \(a = x_0\) dan \(b = x_n\), maka fungsi cubic spline \(S(x)\) adalah fungsi yang memenuhi syarat:
+Apabila diberikan \(n + 1\) titik data \(x_i, y_i\), dimana \(a = x_0\) dan \(b = x_n\), maka fungsi \emph{cubic spline} \(S(x)\) adalah fungsi yang memenuhi syarat:
 \begin{itemize}
 	\item \(S(x) \in C^2[a, b]\)
 	\item Pada setiap subinterval \([x_{i - 1}, x_i]\) dimana \(i = 1, ..., n\), \(S(x)\) adalah polinomial derajat 3.
@@ -125,7 +125,7 @@ Pada umumnya, sebuah \emph{cubic spline} harus memenuhi beberapa syarat:
 	\item Turunan kedua \(S(x)\) kontinu pada interval \([0, n]\): \(S_i''(x_{i + 1}) = S_{i + 1}''(x_{i + 1})\)
 \end{itemize}
 
-Selain itu, sebuah fungsi cubic spline juga harus memenuhi sebuah \emph{boundary condition} untuk membentuk suatu sistem persamaan yang dapat diselesaikan. Pada tugas kali ini, \emph{boundary condition} yang digunakan adalah kondisi \emph{natural} yang didefinisikan sebagai:
+Selain itu, sebuah fungsi \emph{cubic spline} juga harus memenuhi sebuah \emph{boundary condition} untuk membentuk suatu sistem persamaan yang dapat diselesaikan. Pada tugas kali ini, \emph{boundary condition} yang digunakan adalah kondisi \emph{natural} yang didefinisikan sebagai:
 \begin{equation}
 	S_0''(x_0) = 0
 \end{equation}
@@ -133,16 +133,16 @@ Selain itu, sebuah fungsi cubic spline juga harus memenuhi sebuah \emph{boundary
 	S_{n-1}''(x_n) = 0
 \end{equation}
 
-Dari syarat-syarat tersebut akan diperoleh suatu sistem persamaan linear yang dapat digunakan untuk mencari koefisien dari setiap \emph{piecewise cubic function} yang menginterpolasi interval \([a, b]\).
+Dari syarat-syarat tersebut, akan diperoleh suatu sistem persamaan linear yang dapat digunakan untuk mencari koefisien dari setiap \emph{piecewise cubic function} yang menginterpolasi interval \([a, b]\).
 
 Setelah mendefinisikan syarat-syarat yang harus dipenuhi oleh \emph{cubic spline}, maka kita dapat mulai membangun definisi umum \emph{natural cubic spline} yang dapat diimplementasikan dengan menggunakan MATLAB. Terdapat dua pendekatan yang dapat dilakukan untuk membangun sistem ini, yakni secara \emph{top-down} ataupun secara \emph{bottom-up}.
 
-Pendekatan \emph{top-down} dilakukan dengan mencari nilai-nilai koefisien \(a, b, c, d\) yang dapat memenuhi persamaan \(S_i(x) = a_i + b_ix + c_ix^2 + d_ix^3\). Pendekatan ini akan menghasilkan suatu sistem persamaan yang memiliki 4n \emph{unknowns} dan 4n \emph{equations}, dimana n adalah jumlah titik yang ingin di-interpolasi.
+Pendekatan \emph{top-down} dilakukan dengan mencari nilai-nilai koefisien \(a, b, c, d\) yang dapat memenuhi persamaan \(S_i(x) = a_i + b_ix + c_ix^2 + d_ix^3\). Pendekatan ini akan menghasilkan suatu sistem persamaan yang memiliki \(4n\) \emph{unknowns} dan \(4n\) \emph{equations}, dimana \(n\) adalah jumlah titik yang ingin diinterpolasi.
 
 Sementara itu pendekatan \emph{bottom-up} dilakukan dengan pertama mendefinisikan sebuah fungsi \(S''(x)\) linear yang kemudian diintegrasikan untuk mendapatkan suatu fungsi \(S(x)\) kubik. Lalu kita dapat menggunakan syarat-syarat yang sudah didefinisikan pada bagian sebelumnya untuk mencari \emph{unknown terms} yang dihasilkan oleh proses integrasi dan mendefinisikan sistem persamaan yang mencari semua \emph{knot} pada \emph{spline} dan fungsi \emph{spline} pada setiap interval.
 
 \subsection{Membangun Algoritma Natural Cubic Spline}
-Kami akan menggunakan pendekatan \emph{bottom-up} untuk membangun algoritma Natural Cubic Spline yang akan digunakan pada fungsi \((x(t), y(t))\).
+Kami akan menggunakan pendekatan \emph{bottom-up} untuk membangun algoritma \emph{Natural Cubic Spline} yang akan digunakan pada fungsi \((x(t), y(t))\).
 
 Asumsikan bahwa:
 \begin{itemize}
@@ -157,9 +157,9 @@ Asumsikan bahwa:
 	      Dimana \(k_i\) adalah nilai turunan kedua \(f(x)\) pada segmen ke-i
 \end{itemize}
 
-Dengan asumsi tersebut, kita dapat mulai membangun fungsi interpolant \(f_{i, i+1}(x)\) dengan asumsi fungsi tersebut adalah sebuah fungsi kubik. Karena fungsi tersebut merupakan suatu fungsi derajat tiga, maka turunan keduanya pada suatu \(x\) merupakan sebuah fungsi linear.
+Dengan asumsi tersebut, kita dapat mulai membangun fungsi \emph{interpolant} \(f_{i, i+1}(x)\) dengan asumsi fungsi tersebut adalah sebuah fungsi kubik. Karena fungsi tersebut merupakan suatu fungsi derajat tiga, maka turunan keduanya pada suatu \(x\) merupakan sebuah fungsi linear.
 
-Ingat bahwa sebuah fungsi linear yang menginterpolasi 2 titik dapat dicari menggunakan basis Lagrange, sehingga kita dapat mendefinisikan \(S''(x)\) sebagai berikut:
+Ingat bahwa sebuah fungsi linear yang menginterpolasi dua titik dapat dicari menggunakan basis Lagrange, sehingga kita dapat mendefinisikan \(S''(x)\) sebagai berikut.
 \begin{equation}
 	f''_{i, i+1}(x) = k_i\frac{x-x_{i + 1}}{x_i - x_{i + 1}} + k_{i+1}\frac{x - x_i}{x_{i + 1} - x_i}
 \end{equation}
@@ -196,13 +196,13 @@ Sehingga kita akan mendapatkan,
 	\end{split}
 \end{equation}
 
-Selanjutnya kita dapat menggunakan syarat-syarat dari fungsi \(S(x)\) untuk menemukan A dan B yang dapat menyelesaikan rumus diatas.
+Selanjutnya kita dapat menggunakan syarat-syarat dari fungsi \(S(x)\) untuk menemukan A dan B yang dapat menyelesaikan rumus di atas.
 
 \begin{itemize}
 	\item
 	      \(f_{i, i+1}(x_i) = y_i\)
 
-	      Apabila kita mengsubstitusi syarat ini ke persamaan diatas, maka kita akan mendapatkan:
+	      Apabila kita melakukan substitusi syarat ini ke persamaan di atas, maka kita akan mendapatkan:
 	      \begin{equation*}
 		      y_i = \frac{k_i(x_i - x_{i+1})^3}{6(x_i - x_{i+1})} + A(x_i - x_{i+1})
 	      \end{equation*}
@@ -216,7 +216,7 @@ Selanjutnya kita dapat menggunakan syarat-syarat dari fungsi \(S(x)\) untuk mene
 	\item
 	      \(f_{i, i+1}(x_{i+1}) = y_{i+1}\)
 
-	      Apabila kita mengsubstitusi syarat ini ke persamaan diatas, maka kita akan mendapatkan:
+	      Apabila kita melakukan substitusi syarat ini ke persamaan di atas, maka kita akan mendapatkan:
 	      \begin{equation*}
 		      y_{i+1} = B(x_{i+1} - x_i) - \frac{k_{i+1}(x_{i+1}-x_i)^3}{6(x_i - x_{i + 1})}
 	      \end{equation*}
@@ -231,7 +231,7 @@ Selanjutnya kita dapat menggunakan syarat-syarat dari fungsi \(S(x)\) untuk mene
 	      \end{equation}
 \end{itemize}
 
-Setelah mendapatkan \(A\) dan \(B\) kita dapat mengsubstitusikan kembali suku-suku tersebut ke \(f_{i, i+1}(x)\) untuk mendapatkan:
+Setelah mendapatkan \(A\) dan \(B\) kita dapat melakukan substitusi kembali suku-suku tersebut ke \(f_{i, i+1}(x)\) untuk mendapatkan:
 \begin{equation}
 	\begin{split}
 		f_{i, i+1}(x) & = \frac{k_i}{6}[\frac{x-x_{i+1}^3}{x_i-x_{i+1}} - (x - x_{i+1})(x_i - x_{i+1})]\\
@@ -240,11 +240,11 @@ Setelah mendapatkan \(A\) dan \(B\) kita dapat mengsubstitusikan kembali suku-su
 	\end{split}
 \end{equation}
 
-Selanjutnya kita harus mencari vektor \(k\) yang dapat digunakan untuk menghitung nilai interpolasi. Ingat bahwa suatu fungsi spline harus memenuhi:
+Selanjutnya kita harus mencari vektor \(k\) yang dapat digunakan untuk menghitung nilai interpolasi. Ingat bahwa suatu fungsi \emph{spline} harus memenuhi:
 \begin{equation*}
 	f_{i-1, i}'(x_i) = f_{i, i+1}'(x_i)
 \end{equation*}
-Dimana \(i = 2, 3, \dots, n-1\) karena diketahui bahwa \(k_i = k_n = 0\) berdasarkan \emph{natural boundary condition}. Maka kita akan mendapatkan persamaan sebagai berikut:
+Dimana \(i = 2, 3, \dots, n-1\) karena diketahui bahwa \(k_i = k_n = 0\) berdasarkan \emph{natural boundary condition}. Maka kita akan mendapatkan persamaan sebagai berikut.
 \begin{equation*}
 	\begin{split}
 		f'_{i, i+1}(x_i) & = \frac{k_i}{6}[\frac{3(x-x_{i+1})^2}{x_i - x_{i+1}} - (x_i - x_{i+1})]\\
@@ -271,7 +271,7 @@ Dimana \(i = 2, 3, \dots, n-1\) karena diketahui bahwa \(k_i = k_n = 0\) berdasa
 	\frac{k_{i-1}}{6}[\frac{3(x-x_{i})^2}{x_{i-1} - x_{i}} - (x_{i-1} - x_{i})] - \frac{k_{i}}{6}[\frac{3(x-x_{i-1})^2}{x_{i-1} - x_{i}} - (x_{i-1} - x_{i})] + \frac{y_{i-1} - y_{i}}{x_{i-1} - x_{i}}
 \end{equation*}
 
-Menyelesaikan persamaan tersebut akan menghasilkan sistem persamaan linear sebagai berikut:
+Menyelesaikan persamaan tersebut akan menghasilkan sistem persamaan linear sebagai berikut.
 \begin{equation}
 	k_{i-1}(x_{i-1} - x_i) + 2k_i(x_{i-1} - x_{i+1}) + k_{i+1}(x_i - x_{i+1}) = 6(\frac{y_{i-1}-y_i}{x_{i-1}-x_i} - \frac{y_i-y_{i+1}}{x_i - x_{i+1}})
 \end{equation}
@@ -315,7 +315,7 @@ Menggunakan perumusan umum untuk \emph{natural cubic spline} yang telah dibangun
 	\item \(|\vec{x}| = |\vec{y}| = N\) dimana \(N > 0\)
 	\item \(t_i\) adalah nilai yang merepresentasikan waktu, dimana \(0 \leq t_i \leq N\) dan \(t_i < t_{i+1}\)
 \end{itemize}
-Maka untuk setiap input \((x, y)\) yang diberikan, kita dapat mengasosiasikan sebuah nilai \(t\) dengan posisi \(x\) dan posisi \(y\) suatu benda pada detik tertentu. Maka, untung mendapatkan transisi yang halus diantara \((x, y)\) yang diketahui, kita dapat mendefinisikan \(x(t)\) sebagai fungsi yang menginterpolasi \(x\) pada suatu detik \(t\) dan \(y(t)\) sebagai fungsi yang menginterpolasi \(y\) pada suatu detik \(t\). Maka kita dapat mendefinisikan \emph{interpolated position} dari sebuah benda pada setiap waktu sebagai:
+Maka untuk setiap input \((x, y)\) yang diberikan, kita dapat mengasosiasikan sebuah nilai \(t\) dengan posisi \(x\) dan posisi \(y\) suatu benda pada detik tertentu. Oleh karena itu, untuk mendapatkan transisi yang halus diantara \((x, y)\) yang diketahui, kita dapat mendefinisikan \(x(t)\) sebagai fungsi yang menginterpolasi \(x\) pada suatu detik \(t\) dan \(y(t)\) sebagai fungsi yang menginterpolasi \(y\) pada suatu detik \(t\). Maka kita dapat mendefinisikan \emph{interpolated position} dari sebuah benda pada setiap waktu sebagai:
 \begin{equation*}
 	(x_{t'}, y_{t'}) = (x(t'), y(t')) = (f_{t_i, t_{i+1}}(t'), g_{t_i, t_{i+1}}(t'))
 \end{equation*}
@@ -335,7 +335,6 @@ Dimana,
 	      \emph{Determining \(k_i\)}
 	      \newline
 	      Proses penyelesaian SPL pada algoritma dibawah menggunakan \emph{built-in matrix solve} dari Octave/MATLAB, namun karena bentuk SPL akan berupa sebuah matriks tridiagonal, kita dapat juga menyelesaikannya dalam kompleksitas waktu \(O(n)\) dengan menggunakan \emph{Thomas algorithm}.
-	      \textbf{Code:}
 	      \lstinputlisting{assets/codes/getSplineCoeff.m}
 	      \pagebreak
 	\item
@@ -353,7 +352,7 @@ Dimana,
 	\caption{Contoh Soal \#1: Original}
 	\label{fig_tc1}
 \end{figure}
-Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik dengan contoh yang telah diberikan pada soal menghasilkan kurva sebagai berikut:
+Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik dengan contoh yang telah diberikan pada soal menghasilkan kurva sebagai berikut.
 \begin{figure}[H]
 	\centering
 	\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc1_curve}
@@ -362,7 +361,7 @@ Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik d
 \end{figure}
 Apabila dibandingkan dengan grafik hasil interpolasi yang diberikan pada soal, dapat dilihat bahwa kurva yang dihasilkan oleh fungsi interpolasi kami memiliki bentuk yang cukup identik dengan grafik asli. Hal ini menunjukkan bahwa algoritma \emph{parametric cubic spline} yang kami gunakan sudah cukup mendekati algoritma yang digunakan untuk membuat contoh pertama pada soal.
 
-Berikut ini merupakan output dari fungsi \(x(t)\) dan \(y(t)\) yang menghasilkan \emph{output} kurva diatas:
+Berikut ini merupakan output dari fungsi \(x(t)\) dan \(y(t)\) yang menghasilkan \emph{output} kurva di atas:
 \begin{multicols}{2}
 	\begin{figure}[H]
 		\centering
@@ -385,7 +384,7 @@ Perhatikan bahwa grafik yang dihasilkan merupakan grafik yang menginterpolasi ti
 	\caption{Contoh Soal \#2: Original}
 	\label{fig_tc2}
 \end{figure}
-Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik dengan contoh yang telah diberikan pada soal menghasilkan kurva sebagai berikut:
+Pemanggilan fungsi \emph{parametric spline} menggunakan koordinat yang identik dengan contoh yang telah diberikan pada soal menghasilkan kurva sebagai berikut.
 \begin{figure}[H]
 	\centering
 	\includegraphics[max size={\textwidth/2}{\textheight}]{anum_tc2_curve}
@@ -417,7 +416,7 @@ Selain memiliki manfaat dalam menginterpolasi gerak dari suatu benda yang diketa
 	\caption{Amogus: Original}
 \end{figure}
 
-Untuk membuat suatu kurva yang mengaproksimasi bentuk dari gambar tersebut, kami melakukan pemanggilan fungsi dengan koordinat sebagai berikut:
+Untuk membuat suatu kurva yang mengaproksimasi bentuk dari gambar tersebut, kami melakukan pemanggilan fungsi dengan koordinat sebagai berikut.
 \lstinputlisting{assets/codes/amogus.m}
 
 \begin{figure}[H]
@@ -425,7 +424,7 @@ Untuk membuat suatu kurva yang mengaproksimasi bentuk dari gambar tersebut, kami
 	\includegraphics[max size={\textwidth/2}{\textheight}]{amogus_curve.png}
 	\caption{Amogus: Function Output}
 \end{figure}
-Terlihat bahwa fungsi \emph{parametric spline} dapat menghasilkan \emph{outline} gambar yang cukup identik dengan gambar asli yang diberikan diatas. Hal ini mendemonstrasikan salah satu aplikasi dari fungsi \emph{parametric spline} pada bidang \emph{computer graphics} dan \emph{digital art}.
+Terlihat bahwa fungsi \emph{parametric spline} dapat menghasilkan \emph{outline} gambar yang cukup identik dengan gambar asli yang diberikan di atas. Hal ini mendemonstrasikan salah satu aplikasi dari fungsi \emph{parametric spline} pada bidang \emph{computer graphics} dan \emph{digital art}.
 
 \section{Kompleksitas Algoritma}
 \subsection{Kompleksitas Kalkulasi Koefisien}
@@ -465,13 +464,13 @@ Asumsikan bahwa m adalah jumlah titik yang akan di-interpolasi oleh fungsi \emph
 \begin{equation}
 	Pembagian = \sum_{n=0}^{m} 3 = 3m
 \end{equation}
-Maka, jumlah \emph{floating point opeartion} keseluruhan dari fungsi interpolasi diatas adalah:
+Maka, jumlah \emph{floating point opeartion} keseluruhan dari fungsi interpolasi di atas adalah:
 \begin{equation}
 	Total = Penjumlahan + Pengurangan + Perkalian + Pembagian = 24m
 \end{equation}
 
 \subsection{Kompleksitas Fungsi Parametric Spline}
-Agar perhitungan \emph{floating point operation} dapat dilakukan dengan lebih mudah, maka fungsi parametric spline yang diberikan diatas kami rubah menjadi bentuk yang lebih sederhana yakni:
+Agar perhitungan \emph{floating point operation} dapat dilakukan dengan lebih mudah, maka fungsi parametric spline yang diberikan di atas kami rubah menjadi bentuk yang lebih sederhana yakni:
 \lstinputlisting{assets/codes/simplifiedParametric.m}\
 Berdasarkan perhitungan \emph{floating point operation} yang telah dilakukan pada bagian sebelumnya, dan asumsi bahwa \(m = \frac{n}{0.1} = 10n\), maka kompleksitas akhir dari fungsi \emph{paramateric spline} yang telah dibuat adalah:
 \begin{equation}
