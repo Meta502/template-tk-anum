@@ -55,7 +55,7 @@
 	% make the title area
 	\maketitle
 	\begin{abstract}
-		Studi ini mengeksplorasi penggunaan \emph{cubic spline}---atau lebih tepatnya \emph{cubic spline} dengan \emph{natural boundary condition}---untuk membangun suatu fungsi parametrik yang menginterpolasi gerak dari benda pada suatu detik ke-\(t\). Studi ini mendemonstrasikan bahwa \emph{natural cubic spline} memiliki fleksibilitas yang tinggi karena dapat digunakan untuk berbagai macam aplikasi dengan kompleksitas algoritma yang cukup rendah, sehingga selain untuk menggambarkan laju dari suatu benda, \emph{parametric natural cubic spline} dapat digunakan untuk berbagai macam \emph{use-case} lainnya.
+		Studi ini mengeksplorasi penggunaan \emph{cubic spline}---atau lebih tepatnya \emph{cubic spline} dengan \emph{natural boundary condition}---untuk membangun suatu fungsi parametrik yang menginterpolasi gerak dari benda pada suatu detik ke-\(t\). Studi ini mendemonstrasikan bahwa \emph{natural cubic spline} memiliki fleksibilitas yang tinggi karena dapat digunakan untuk berbagai macam aplikasi dengan kompleksitas algoritma yang cukup rendah, sehingga selain untuk menggambarkan laju dari suatu benda, \emph{parametric natural cubic spline} dapat digunakan untuk berbagai macam \emph{use case} lainnya.
 	\end{abstract}
 	\tableofcontents
 	\listoffigures
@@ -66,9 +66,9 @@
 \section{Pendahuluan}
 Interpolasi merupakan teknik yang digunakan untuk membangun suatu fungsi yang melewati sebuah himpunan titik-titik diskret yang diketahui. Fungsi interpolasi memiliki aplikasi yang luas pada ilmu komputer karena dapat digunakan untuk menggambarkan berbagai kurva kompleks dengan \emph{computational cost} yang relatif murah apabila dibandingkan dengan metode \emph{brute force} (mencari seluruh titik yang memenuhi suatu kurva secara \emph{exhaustive}). Interpolasi beberapa titik diskret dapat dicapai dengan berbagai metode interpolasi seperti interpolasi konstan, interpolasi linear, interpolasi polinomial, dan interpolasi \emph{spline} yang menjadi topik dari paper ini.
 
-Secara matematis, sebuah fungsi interpolasi dapat dinyatakan sebagai suatu fungsi \(P(x)\) di mana \(x\) adalah sebuah titik yang ingin diinterpolasi. Hasil dari fungsi tersebut adalah sebuah \emph{value} yang merupakan aproksimasi dari nilai fungsi \(f(x)\) yang melewati seluruh titik-titik diskret yang nilainya sudah diketahui.
+Secara matematis, sebuah fungsi interpolasi dapat dinyatakan sebagai suatu fungsi \(P(x)\) dimana \(x\) adalah sebuah titik yang ingin diinterpolasi. Hasil dari fungsi tersebut adalah sebuah \emph{value} yang merupakan aproksimasi dari nilai fungsi \(f(x)\) yang melewati seluruh titik-titik diskret yang nilainya sudah diketahui.
 
-Pada \emph{paper} ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline}—atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural}—untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). Cubic spline dapat didefinisikan sebagai suatu \emph{piecewise polynomial function} yang menginterpolasi sebuah himpunan titik dengan menggunakan sebuah \emph{cubic polynomial} sebagai fungsi dasarnya pada setiap interval.
+Pada laporan ini, kami ingin mengeksplorasi pemanfaatan sebuah fungsi \emph{cubic spline}—atau lebih tepatnya fungsi \emph{cubic spline} dengan kondisi \emph{natural}—untuk melakukan \emph{smoothing} pada perubahan posisi suatu titik di interval waktu \([0, n]\). Cubic spline dapat didefinisikan sebagai suatu \emph{piecewise polynomial function} yang menginterpolasi sebuah himpunan titik dengan menggunakan sebuah \emph{cubic polynomial} sebagai fungsi dasarnya pada setiap interval.
 
 Untuk sebuah input yang berisi \(n\) titik, akan terdapat \(n-1\) \emph{cubic function} yang menginterpolasi titik-titik tersebut di setiap interval. Pembangunan spline ini sendiri akan dijelaskan secara lebih mendetil pada bagian selanjutnya. Fungsi \emph{natural cubic spline} ini kemudian akan digunakan sebagai basis untuk suatu fungsi parametrik \((x(t), y(t))\) yang mengambil suatu \emph{array} berisi \emph{time-step} dengan resolusi \(r\) dan menginterpolasi (x, y) untuk input tersebut.
 
@@ -484,7 +484,7 @@ Berdasarkan perhitungan \emph{floating point operation} yang telah dilakukan pad
 \section{Kesimpulan}
 Pada laporan ini, kami telah berhasil mendemonstrasikan bahwa fungsi \emph{natural cubic spline} dapat digunakan untuk menginterpolasi berbagai macam bentuk grafik, serta digunakan untuk membuat kurva seperti pada aplikasi \emph{vector art}.
 
-Berdasarkan percobaan yang telah kami lakukan serta analisis kompleksitas yang dilakukan pada ini bagian sebelumnya, kami menyimpulkan bahwa \emph{natural cubic spline} dan \emph{interpolasi} pada umumnya memiliki potensi aplikasi yang sangat luas pada berbagai bidang, terutama karena fleksibilitasnya dalam menggambar berbagai bentuk kurva hanya dengan mendefinisikan beberapa titik, serta karena kompleksitas operasi-nya yang cukup sederhana, dimana sebuah implementasi spline yang efisien dapet berjalan dengan kompleksitas \emph{floating point operation} \(O(n)\).
+Berdasarkan percobaan yang telah kami lakukan serta analisis kompleksitas yang dilakukan pada ini bagian sebelumnya, kami menyimpulkan bahwa \emph{natural cubic spline} dan \emph{interpolasi} pada umumnya memiliki potensi aplikasi yang sangat luas pada berbagai bidang, terutama karena fleksibilitasnya dalam menggambar berbagai bentuk kurva hanya dengan mendefinisikan beberapa titik, serta karena kompleksitas operasinya yang cukup sederhana, dimana sebuah implementasi spline yang efisien dapet berjalan dengan kompleksitas \emph{floating point operation} \(O(n)\).
 
 
 
