@@ -46,10 +46,7 @@
 	% make the title area
 	\maketitle
 	\begin{abstract}
-		The abstract does not only mention the paper but is the original paper shrunken to approximately 200 words. It states the purpose, reports the information obtained and gives conclusions, and recommendations. In short, it summarizes the main points of the study adequately and accurately. It provides information from every major section in the body of the report in a dense and compact way. Past tense and active voice is appropriate when describing what was done. If there is any, it includes key statistical detail.
-
-		Depending on the format you use, the abstract may come on the title page or at the beginning of the main report.
-
+		Studi ini mengeksplorasi perhitungan integrasi numerik pada permasalahan aproksimasi probabilitas variabel acak Z. Digunakan pendekatan integrasi numerik dengan metode perhitungan numerik dan \emph{quadrature} yaitu \emph{Composite Simpson Method}, \emph{Adaptive Method}, \emph{Romberg Method}. Hasil dari studi ini berupa percobaan ketiga metode perhitungan tersebut dalam mengaproksimasi probabilitas \(P(a \le Z \le b)\) dengan eror kurang dari TOL. Pengukuran toleransi eror baik dari segi teoritis maupun perbandingan fungsi referensi \emph{QuadGK} dan \emph{NormCDF} ditemukan mendekati hasil yang akurat dengan eror berpangkat rendah untuk implementasi ketiga metode aproksimasi integrasi di atas. Pada studi ini juga dijelaskan terkait analisis kompleksitas algoritma metode aproksimasi dari segi FLOPs dan perhitungan \emph{function call}.
 	\end{abstract}
 	\tableofcontents
 	\listoffigures
@@ -726,7 +723,7 @@ Pembuktian melalui eksekusi percobaan pada bagian sebelumnya, penulis membanding
 				      \bottomrule % Bottom horizontal line
 			      \end{tabular}
 			      \smallskip
-			      \caption{Hasil perbandingan nilai aproksimasi integrasi dengan Tabel Z} % Table caption, can be commented out if no caption is required
+			      \caption{Hasil Perbandingan Nilai Aproksimasi Integrasi dengan Tabel Z} % Table caption, can be commented out if no caption is required
 			      \label{tab: template} % A label for referencing this table elsewhere, references are used in text as \ref{label}
 		      \end{table}
 	      \end{center}
@@ -1158,9 +1155,12 @@ Kesimpulan disini.
 % % Example of a table from http://www.latextemplates.com/template/professional-table
 
 \begin{thebibliography}{1}
-	\bibitem{basaruddin_2007}T.~Basaruddin, \emph{Komputasi Numerik}. Jakarta, Indonesia: Fakultas Ilmu Komputer UI, 2007.
 	\bibitem{jim_lamber}Jim Lambers, \emph{Lecture 29 Notes}.
 	Mississippi, USA: University of Southern Mississippi, 2009. [MAT 460/560 Fall Semester 2009-10 Lecture Notes] Available: \url{https://www.math.usm.edu/lambers/mat460/fall09/lecture29.pdf}. [Accessed on: Dec.~17, 2022].
+	\bibitem{jim_lamber2}Jim Lambers, \emph{Lecture 30 Notes}.
+	Mississippi, USA: University of Southern Mississippi, 2009. [MAT 460/560 Fall Semester 2009-10 Lecture 30 Notes] Available: \url{https://www.math.usm.edu/lambers/mat460/fall09/lecture30.pdf}. [Accessed on: Dec.~17, 2022].
+	\bibitem{numerical-analysis-sauer} Sauer, T. (2011). Numerical Analysis (2nd edition.). USA: Addison-Wesley Publishing Company.
+	\bibitem{basaruddin_2007}T.~Basaruddin, \emph{Komputasi Numerik}. Jakarta, Indonesia: Fakultas Ilmu Komputer UI, 2007.
 \end{thebibliography}
 
 \end{document}
