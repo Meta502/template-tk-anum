@@ -534,7 +534,7 @@ Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, pen
 			if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
 			Q = Q2+Q3;   %accept trapezoid rule value
 			else
-			Q = TrapezoidAdaptive(f, a,c, Tol/2, ori) + TrapezoidAdaptive(f,c,b, Tol/2, ori); % use algorithm for [a,c] and [c,b]
+			Q = TrapezoidAdaptive(f, a,c, Tol, ori) + TrapezoidAdaptive(f,c,b, Tol, ori); % use algorithm for [a,c] and [c,b]
 			end
 	  	end
 	\end{lstlisting}
@@ -681,8 +681,8 @@ Pembuktian melalui eksekusi percobaan pada bagian sebelumnya, penulis membanding
 	      \begin{lstlisting}[language=Octave]
 				cdf = normcdf([a b]);
 				cdf_ans = cdf(2) - cdf(1);
-				err_cdf = abs(cdf - approx);
-				err_cdf_ab = abs(cdf - integ);
+				err_cdf = abs(cdf_ans - approx);
+				err_cdf_ab = abs(cdf_ans - integ);
 
 				printf("----------")
 				printf("\nHasil NormCDF for Z value (Actual Value)\n: %d", cdf_ans)
@@ -708,17 +708,26 @@ Pembuktian melalui eksekusi percobaan pada bagian sebelumnya, penulis membanding
 	      \begin{center}
 		      \begin{table}[H] % Add the following just after the closing bracket on this line to specify a position for the table on the page: [h], [t], [b] or [p] - these mean: here, top, bottom and on a separate page, respectively
 			      \centering % Centers the table on the page, comment out to left-justify
-			      \begin{tabular}{cccccc}
+			      \begin{tabular}{c | c | c| c | c | c}
 				      \toprule
-				      Input a & Input b & Tabel Z   & TOL  & Hasil Adaptive & Error (\%) \\ % Column names row
+				      Input a & Input b & Tabel Z           & TOL  & Hasil Adaptive    & Error (\%)            \\ % Column names row
 				      \midrule
-				      0       & 0.01    & 0.0040    & 1e-4 & 3.9895e-03     & 1.05e-05   \\
-				      0.3     & 0.32    & 0.0076    & 1e-4 & 7.6055e-03     & 5.4642e-06 \\
-				      0.5     & 0.53    & 0.007     & 1e-4 & 0.010482       & 3.4816e-03 \\
-				      1.1     & 1.15    & 0.0105941 & 1e-4 & 0.010594       & 8.0155e-08 \\
-				      1.4     & 1.49    & 0.0127    & 1e-4 & 0.012645       & 5.5458e-05 \\
-				      1.9     & 1.97    & 0.0043    & 1e-4 & 4.2974e-03     & 2.5911e-06 \\
-				      2.2     & 2.29    & 0.0029    & 1e-4 & 2.8930e-03     & 7.0240e-06 \\
+				      0       & 0.01    & 0.0040            & 1e-4 & 3.9895e-03        & 1.05e-05              \\
+				      0.3     & 0.32    & 0.0076            & 1e-4 & 7.6055e-03        & 5.4642e-06            \\
+				      0.5     & 0.53    & 0.007             & 1e-4 & 0.010482          & 3.4816e-03            \\
+				      1.1     & 1.15    & 0.0105941         & 1e-4 & 0.010594          & 8.0155e-08            \\
+				      1.4     & 1.49    & 0.0127            & 1e-4 & 0.012645          & 5.5458e-05            \\
+				      1.9     & 1.97    & 0.0043            & 1e-4 & 4.2974e-03        & 2.5911e-06            \\
+				      2.2     & 2.29    & 0.0029            & 1e-4 & 2.8930e-03        & 7.0240e-06            \\
+				      -1      & 1       & 0.682689          & 1e-2 & 0.680164          & 0.0025258             \\
+				      -1      & 1       & 0.682689          & 1e-5 & 0.682685          & 4.70792e-06           \\
+				      -1      & 3       & 0.839995          & 1e-3 & 0.840104          & 0.000108955           \\
+				      -1      & 3       & 0.839995          & 1e-6 & 0.839995          & 8.49356e-08           \\
+				      -1      & 0       & 0.341345          & 1e-6 & 0.341344          & 4.81717e-07           \\
+				      2       & 3       & 0.0214002         & 1e-2 & 0.341344          & 0.000492997           \\
+				      2       & 3       & 0.0214002         & 1e-7 & 0.341344          & 5.15689e-08           \\
+				      -3      & 3       & 0.997300203936740 & 1e-2 & 0.998816968978829 & 0.00151677            \\
+				      -3      & 3       & 0.997300203936740 & 1e-7 & 0.997300217226082 & 1.328934207123211e-08 \\
 
 				      \bottomrule % Bottom horizontal line
 			      \end{tabular}
@@ -739,7 +748,7 @@ Percobaan di atas jika dijalankan dengan serangkaian TOL yang berbeda yakni \(TO
 	\label{fig:difGraphAdaptive}
 \end{figure}
 
-Dengan begitu percobaan aproksimasi metode Adaptive dengan aturan Trapezoid mengeluarkan hasil yang sesuai dan memiliki akurasi yang sesuai serta menyesuaikan dengan TOL eror yang diberikan. Hasil komputasi juga sesuai atau mendekati dengan fungsi distribusi normal dan hasil integrasi aktual fungsi bawaan. Diperlihatkan juga dengan plot eror di atas yang fungsinya semakin mendekati nol.
+Dengan begitu percobaan aproksimasi metode Adaptive dengan aturan Trapezoid mengeluarkan hasil yang sesuai dan memiliki akurasi yang sesuai serta menyesuaikan dengan TOL eror yang diberikan. Hasil komputasi juga sesuai atau mendekati dengan fungsi distribusi normal dan hasil integrasi aktual fungsi bawaan. Diperlihatkan juga dengan plot eror di atas yang fungsinya semakin mendekati eror karena berdasarkan Tabel I di atas nilai aproksimasi akan semakin mendekati hasilnya untuk nilai TOL yang semakin kecil.
 
 \subsection{Analisis Kompleksitas}
 Berikut dilakukan perhitungan kompleksitas berdasarkan \emph{function call} pada implementasi kode berikut:
@@ -757,7 +766,7 @@ Berikut dilakukan perhitungan kompleksitas berdasarkan \emph{function call} pada
 			if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
 				Q = Q2+Q3;   %accept trapezoid rule value
 			else
-				Q = TrapezoidAdaptive(f,a,c,Tol/2,ori) + TrapezoidAdaptive(f,c,b,Tol/2,ori);
+				Q = TrapezoidAdaptive(f,a,c,Tol,ori) + TrapezoidAdaptive(f,c,b,Tol,ori);
 				% use algorithm for [a,c] and [c,b]
 			end
 		end
@@ -766,7 +775,7 @@ Berikut dilakukan perhitungan kompleksitas berdasarkan \emph{function call} pada
 
 \emph{Adaptive quadrature} merupakan metode aproksimasi fungsi integrasi rekursif dengan setiap kondisi yang belum memenuhi akan membagi \emph{problem} menjadi dua buah \emph{sub-problem} interval baru. Untuk setiap pemanggilan fungsi di atas dilakukan 3 \emph{function call} untuk mendapatkan \emph{f(a), f(b), dan f(c)}.
 
-Pengembalian nilai aproksimasi adalah penjumlahan hasil aproksimasi nilai integrasi interval yang dipecah menjadi \emph{TrapezoidAdaptive(f,a,c,Tol/2,ori)} dan \emph{TrapezoidAdaptive(f,c,b,Tol/2,ori)}. Hasil penggabungan keduanya memiliki kompleksitas \emph{O(1)}. Pemanggilan perhitungan untuk \emph{Q1, Q2, dan Q3} juga bernilai \emph{O(1)}. Setiap pemanggilan fungsi \emph{TrapezoidAdaptive} maka besar interval akan semakin pendek menjadi \emph{n/2} dengan n adalah panjang interval yakni \emph{n = b - a}.
+Pengembalian nilai aproksimasi adalah penjumlahan hasil aproksimasi nilai integrasi interval yang dipecah menjadi \emph{TrapezoidAdaptive(f,a,c,Tol,ori)} dan \emph{TrapezoidAdaptive(f,c,b,Tol,ori)}. Hasil penggabungan keduanya memiliki kompleksitas \emph{O(1)}. Pemanggilan perhitungan untuk \emph{Q1, Q2, dan Q3} juga bernilai \emph{O(1)}. Setiap pemanggilan fungsi \emph{TrapezoidAdaptive} maka besar interval akan semakin pendek menjadi \emph{n/2} dengan n adalah panjang interval yakni \emph{n = b - a}.
 
 Dengan pembentukan pohon rekursi dari pecahan \emph{sub-problem} interval tiap pemanggilan, didapatkan ketinggian \emph{tree} mencapai \emph{log(n)+1} yang memiliki \emph{cost} yang sama. Maka persamaan rekurensinya dapat digambarkan sebagai berikut:
 \begin{equation*}
@@ -775,7 +784,7 @@ Dengan pembentukan pohon rekursi dari pecahan \emph{sub-problem} interval tiap p
 	\end{split}
 \end{equation*}
 
-Dengan \emph{cost} yang sama untuk tiap pemanggilan fungsinya maka total \emph{cost} bernilai \emph{cn (lg n + 1)}. untuk 3 kali pemanggilan \emph{function call} di setiap fungsi, maka total pemanggilan \emph{function call} secara keseluruhan, mengabaikan \emph{low-order term} dan konstan \emph{c}, \emph{asymptotic equation} untuk kompleksitas \emph{function call} fungsi di atas dituliskan sebagai \emph{O(3n log n)}.
+Dengan \emph{cost} yang sama untuk tiap pemanggilan fungsinya maka total \emph{cost} bernilai \emph{cn (lg n + 1)}. untuk 3 kali pemanggilan \emph{function call} di setiap fungsi, maka total pemanggilan \emph{function call} secara keseluruhan, mengabaikan \emph{low-order term} dan konstan \emph{c}, \emph{asymptotic equation} untuk kompleksitas \emph{function call} fungsi di atas dituliskan sebagai \emph{O(3n log n)} atau secara \emph{general} \emph{O(n log n)} .
 
 \section{Implementasi Algoritma Romberg}
 
@@ -1150,9 +1159,9 @@ Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang 
 Maka dari itu, bisa disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n*j + n*2^j)\) dan untuk \emph{function call} adalah \(O(n*2^j)\) dengan \(n\) adalah ukuran tabel Romberg yang bergantung pada fungsi dan batas toleransi serta nilai masukan, dan \(j\) bergantung pada \(n\).
 
 \section{Kesimpulan}
-Pada laporan ini, kami telah berhasil mendemonstrasikan bahwa integrasi numerik fungsi \emph{z-table} dapat dilakukan menggunakan tiga metode numerik, yaitu metode komposit \emph{Simpson}, metode \emph{adaptive}, dan metode Romberg. Ketiga metode tersebut menghasilkan hasil yang cukup akurat dibandingkan hasil integrasi langsung dengan fungsi \emph{QuadGK} dan \emph{NormCDF}, namun masing-masing metode memiliki kelebihan dan kelemahan dibandingkan dengan metode lainnya.
+Pada laporan ini, kami telah berhasil mendemonstrasikan bahwa integrasi numerik fungsi \emph{z-table} dapat dilakukan menggunakan tiga metode numerik, yaitu metode komposit \emph{Simpson}, metode \emph{Adaptive}, dan metode \emph{Romberg}. Ketiga metode tersebut menghasilkan hasil yang cukup akurat dibandingkan hasil integrasi langsung dengan fungsi \emph{QuadGK} dan \emph{NormCDF}, namun masing-masing metode memiliki kelebihan dan kelemahan dibandingkan dengan metode lainnya.
 
-Berdasarkan percobaan yang telah kami lakukan serta analisis kompleksitas yang dilakukan pada ini bagian sebelumnya, kami menyimpulkan bahwa metode komposit \emph{Simpson} memiliki kompleksitas yang paling sederhana, yakni \(O(n/2)\) secara tinjauan FLOPs dan \(O(n)\) secara tinjauan \emph{function call}. Namun, akurasi yang dimiliki oleh metode komposit \emph{Simpson} tidak cukup tinggi apabila dibandingkan dengan metode lainnya. Metode \emph{adaptive} memiliki akurasi yang lebih tinggi dibandingkan metode komposit \emph{Simpson} (dengan mempertahankan penggunaan pembagian interval tetapi dilakukan pendekatan secara adaptif), namun kompleksitasnya lebih tinggi dibandingkan metode komposit \emph{Simpson}. Metode Romberg sendiri memiliki akurasi yang paling tinggi dibandingkan metode lainnya (dengan menggunakan ekstrapolasi), namun memiliki kompleksitas yang paling tinggi karena dapat berkembang secara pangkat dua untuk variabel \emph{j}.
+Berdasarkan percobaan yang telah kami lakukan serta analisis kompleksitas yang dilakukan pada ini bagian sebelumnya, kami menyimpulkan bahwa metode komposit \emph{Simpson} memiliki kompleksitas yang paling sederhana, yakni \(O(n/2)\) secara tinjauan FLOPs dan \(O(n)\) secara tinjauan \emph{function call}. Namun, akurasi yang dimiliki oleh metode komposit \emph{Simpson} tidak cukup tinggi apabila dibandingkan dengan metode lainnya. Metode \emph{Adaptive} memiliki akurasi yang lebih tinggi dibandingkan metode komposit \emph{Simpson} (dengan mempertahankan penggunaan pembagian interval tetapi dilakukan pendekatan secara adaptif), namun kompleksitasnya lebih tinggi dibandingkan metode komposit \emph{Simpson} yakni sebesar \(O(n log n)\). Metode Romberg sendiri memiliki akurasi yang paling tinggi dibandingkan metode lainnya (dengan menggunakan ekstrapolasi), namun memiliki kompleksitas yang paling tinggi karena dapat berkembang secara pangkat dua untuk variabel \emph{j}.
 
 % % Example of a table from http://www.latextemplates.com/template/professional-table
 
