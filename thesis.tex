@@ -60,127 +60,157 @@
 
 \section{Pendahuluan}
 Integrasi numerik adalah teknik untuk melakukan kalkulasi dan aproksimasi pada suatu nilai dengan menggunakan pendekatan metode perhitungan numerik.  Terdapat berbagai macam metode dan pendekatan baik secara integrasi numerik maupun \emph{quadrature}. Namun dalam paper ini penulis hanya akan melakukan eksplorasi dan pendekatan integrasi numerik dengan menggunakan tiga buah metode yaitu  \emph{Composite Simpson Method}, \emph{Adaptive Method}, \emph{Romberg Method}.
+\begin{enumerate}
+	\item
+	      \emph{Composite Simpson Method}
 
-1. \emph{Composite Simpson Method}
+	      \emph{Composite Simpson Method} merupakan metode integrasi numerik yang terdiri dari dua fundamen, yakni aturan komposit dan metode Simpson.
 
-\emph{Composite Simpson Method} merupakan metode integrasi numerik yang terdiri dari dua fundamen, yakni aturan komposit dan metode Simpson.
+	      Metode Simpson didasari oleh interpolasi pada tiga titik, yaitu \emph{a}, \(\mathrm{c=\frac{(a+b)}{2}}\), dan \emph{b}. Polinomial kuadratik yang menginterpolasi \emph{f(x)} di ketiga titik tersebut adalah sebagai berikut.
 
-Metode Simpson didasari oleh interpolasi pada tiga titik, yaitu \emph{a}, \(\mathrm{c=\frac{(a+b)}{2}}\), dan \emph{b}. Polinomial kuadratik yang menginterpolasi \emph{f(x)} di ketiga titik tersebut adalah sebagai berikut.
+	      \begin{equation*}
+		      \begin{split}
+			      p_{2}(x) & = f(a)+\frac{f(c)-f(a)}{c-a}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c)
+		      \end{split}
+	      \end{equation*}
 
+	      Dengan demikian, diperoleh rumus pendekatan berikut dengan menghitung integral dari polinomial di atas.
+
+	      \begin{flalign*}
+		      S_{f} & = \int_{a}^{b}p_{2}(x)dx                                                                                         &  & \\
+		            & = \int_{a}^{b}\left \{ f(a)+\frac{f(c)-f(a)}{(c-a)}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c) \right \}dx &  & \\
+		            & = \frac{(b-a)}{6}\left \{ f(a)+4f(c)+f(b) \right \}                                                              &  &
+	      \end{flalign*}
+
+	      Metode Simpson dapat memberikan hasil yang eksak untuk polinomial dengan orde dua (\(\mathrm{f(x)=x^{2}}\)).
+
+	      Aturan komposit mendefinisikan pendekatan pembagian integrasi ke dalam beberapa subinterval yang ukurannya lebih kecil. Aturan ini didasari oleh salah satu sifat integral definit berikut.
+
+	      \begin{equation*}
+		      \begin{split}
+			      \int_{a}^{b}f(x)dx=\int_{a}^{c}f(x)dx+\int_{c}^{b}f(x)dx
+		      \end{split}
+	      \end{equation*}
+
+	      Misalkan pada interval \(\mathrm{[a,b]}\) didefinisikan titik-titik \(\mathrm{a=x_{0}<x_{1}<...<x_{n}=b}\), maka didapatkan persamaan integral berikut.
+
+	      \begin{equation*}
+		      \begin{split}
+			      \int_{a}^{b}f(x)dx=\sum_{i=1}^{n}\int_{x_{i-1}}^{x_{i}}f(x)dx
+		      \end{split}
+	      \end{equation*}
+
+	      Dengan menerapkan aturan komposit pada metode Simpson (\emph{n} merupakan jumlah partisi yang dibentuk untuk menyelesaikan permasalahan), didapatkan rumus berikut sebagai rumus metode komposit Simpson.
+
+	      \begin{equation*}
+		      \begin{split}
+			      \int_{a}^{b}f(x)dx=\frac{1}{6}\sum_{i=1+2}^{n-1}\left \{ f(x_{i-1})+4f(x_{i})+f(x_{i+1}) \right \}
+		      \end{split}
+	      \end{equation*}
+
+	      Metode komposit Simpson dapat digunakan selama kondisi \(\mathrm{(x_{i+1}-x_{i-1}) \bmod n}\) bernilai genap.
+
+	\item
+	      \emph{Adaptive Method}
+
+	      \emph{Adaptive quadrature} adalah metode perhitungan yang dapat menyelesaikan permasalahan pengambilan \emph{step-size} dalam aproksimasi integrasi. Pada aturan komposit pada dasarnya mengimplementasikan prosedur yang serupa dengan membagi interval \([a,b]\) menjadi beberapa interval hingga akurasi yang diinginkan tercapai. Namun hal itu dapat berkendala karena kompleksitas waktu yang besar dibutuhkan.
+
+	      \emph{Adaptive quadrature} adalah teknik perhitungan aproksimasi dengan membagi interval awal \([a,b]\) menjadi n sub-interval untuk \([a_j,b_j]\) dengan \emph{j = 0,1,2,....,n-1} bagian interval. Komputasi yang dihitung adalah
+	      \begin{equation*}
+		      \begin{split}
+			      I_j(f) = \int_{a_j}^{b_j} f(x) \,dx
+		      \end{split}
+	      \end{equation*}
+
+	      Untuk setiap pembagian interval \([a_j,b_j]\) dilakukan perhitungan aproksimasi untuk area interval tersebut \(I_j\). Jika kedua interval yang telah dibagi dan dikomputasi sudah konvergen dan bernilai cenderung dekat, maka dapat disimpulkan nilai aprokskimasi untuk integrasi \(I_j\) dan \(I_{j+1}\) mendekati akurasi yang diinginkan dan dapat dikembalikan nilainya. Jika belum mendekati, maka interval \([a_j, b_j]\) menjadi dua buah interval dan melakukan pemanggilan rekursif ke fungsi pada masing-masing sub-interval.
+
+	      Solusi Adaptive Quadrature menggunakan ekstraploasi dengan melalui pendekatan dengan pembagian subinterval, hal ini menyebabkan pemilihan \emph{criteria step-size} dilakukan bersamaan dengan kalkulasi yang sesuai. Pada penelitian ini penulis akan menggunakan Adaptive Quadrature Trapezodial sebagai berikut:
+
+	      \begin{equation*}
+		      \begin{split}
+			      \int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^{(3)} \frac{f^{''}(c_0)}{12}
+		      \end{split}
+	      \end{equation*}
+
+	      Untuk setiap pencarian kriterianya, akan didapatkan \(S_{[a,c]}+S_{[c,b]}\) dengan \(a < c < b\) dan \(c = \frac{b-a}{2}\) pada interval \([a,b]\) yang mengaproksimasi \(S_{[a,b]}\). Pengecekan dapat dilakukan antara \(S[a,b]-(S[a,c]+S[c,b])\) hingga memenuhi kriteria akurasi yang diinginkan.
+	      Maka untuk fungsi \emph{Adaptive} dengan metode \emph{Trapezoid} digunakan pendekatan:
+	      \begin{equation*}
+		      \begin{split}
+			      \int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^{(3)}\frac{f^{''}(c_1)}{12} + S_{[c,b]} - \frac{h^{(3)}}{8}\frac{f^{''}(c_2)}{12} \\
+			      \int_{a}^{b} f(x) \,dx & = S_{[a,b]} + S_{[c,b]} - \frac{h^{(3)}}{4} \frac{f^{''}(c_3)}{12}
+		      \end{split}
+	      \end{equation*}
+
+	      Aproksimasi integrasi dapat dilakukan dengan melakukan pengurangan pada aproksimasi pada interval asli dan interval pemecahan yang kemudian akan dievaluasi dengan akurasi yang diinginkan yaitu batas toleransi TOL yang diberikan.
+
+	\item
+	      \emph{Romberg Method}
+
+	      \emph{Romberg Integration} merupakan metode integrasi yang menggunakan prinsip \emph{composite trapezoidal rule} dan meningkatkan akurasi dengan melakukan ekstrapolasi melalui \emph{Richardson's Extrapolation}.
+
+	      \emph{Romberg} bekerja dengan menggunakan \emph{composite trapezoidal rule} sebagai basis dari perhitungan dan melakukan iterasi dengan melakukan pembagian interval untuk meningkatkan akurasi. Basis ini diiterasi per-baris pada suatu tabel Romberg yang memiliki ukuran \(R(n,n)\) melalui rumus
+
+	      \begin{equation*}
+		      \begin{split}
+			      R(1,1) & = (b-a)\frac{f(a)+f(b)}{2} \\
+			      R(j,1) & = \frac{1}{2}R_{j-1,1}+h_j\sum_{i=1}^{2^{j-2}}f(a+(2i-1)h_j)
+		      \end{split}
+	      \end{equation*}
+
+	      Jika dilihat, \(R(1,1)\) perlu diinisiasi terlebih dahulu karena untuk iterasi berikutnya, akan menggunakan hasil dari iterasi sebelumnya karena bersifat \emph{evolutionary} dengan arti meningkatkan akurasi dari iterasi sebelumnya dengan membagi interval \(h\) menjadi lebih kecil. Nilai \(h\) ini diperkecil setiap iterasi melalui rumus
+
+	      \begin{equation*}
+		      \begin{split}
+			      h_j & = \frac{b-a}{2^{j-1}}
+		      \end{split}
+	      \end{equation*}
+
+	      Dari sini, kita bisa membentuk tabel Romberg \(R\) yang memiliki iterasi \emph{composite trapezoidal rule} dengan iterasi setiap baris, di mana semakin banyak iterasi (dan baris semakin ke bawah), maka akurasi akan semakin meningkat karena memiliki jarak interval \(h\) yang semakin kecil.
+
+	      Untuk setiap baris, kita bisa menemukan akurasi yang lebih tinggi dengan mengekstrapolasi menggunakan \emph{Richardson's Extrapolation} yang mengekstrapolasi hasil dari \emph{composite trapezoidal rule} yang diperoleh. Rumus \emph{Richardson's Extrapolation} yang sudah diadaptasi untuk algoritma Romberg ini dapat dilihat sebagai berikut
+
+	      \begin{equation*}
+		      \begin{split}
+			      R_{j,k} & = \frac{4^{k-1}R_{j,k-1}-R_{j-1,k-1}}{4^{k-1}-1}
+		      \end{split}
+	      \end{equation*}
+
+	      Dengan demikian, kita bisa mengerti bahwa algoritma Romberg melakukan integrasi dengan membangun tabel Romberg \(R\) dengan ukuran \(R(n,n)\) dan mengisi tabel tersebut sehingga membentuk \emph{lower triangular matrix} di mana setiap baris merupakan iterasi \emph{composite trapezoidal rule} dan setiap kolom merupakan peningkatan akurasi dari \emph{composite trapezoidal rule} baris tersebut menggunakan \emph{richardson's extrapolation} dengan meningkatkan \emph{order of accuracy} melalui hasil yang diperoleh pada iterasi-iterasi sebelumnya (yang akan dibahas pada \emph{subsection} toleransi eror di bawah). Dengan demikian, sebuah tabel Romberg yang dihasilkan dapat divisualisasikan sebagai berikut
+
+	      \begin{center}
+		      \begin{tabular}{ c | c c c c c }
+
+			      j/k        & \(R(j,0)\) & \(R(j,1)\) & \(R(j,2)\) & \(R(j,3)\) & \(\cdots\) \\
+			      \hline
+			      0          & \(R(0,0)\) & -          & -          & -          & -          \\
+			      1          & \(R(1,0)\) & \(R(1,1)\) & -          & -          & -          \\
+			      2          & \(R(2,0)\) & \(R(2,1)\) & \(R(2,2)\) & -          & -          \\
+			      3          & \(R(3,0)\) & \(R(3,1)\) & \(R(3,2)\) & \(R(3,3)\) & -          \\
+			      \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\ddots\) \\
+		      \end{tabular}
+	      \end{center}
+
+	      Sesuai dengan prinsip yang dijelaskan di atas, akurasi ditingkatkan dengan ekstrapolasi setiap kolomnya dengan semakin meningkat kolom (semakin ke kanan), maka hasil akan semakin akurat. Dengan demikian, nilai paling akurat untuk setiap iterasi berada pada diagonal matriks tersebut.
+
+	      Hal ini menciptakan suatu sifat/fenomena konvergensi, di mana nilai hasil integrasi akan semakin konvergen menuju suatu solusi perhitungan untuk setiap diagonal yang ada. Apabila nilai diagonal sudah mencapai hasil, maka akan bersifat konvergen di mana hasil komputasi pada diagonal-diagonal sebelumnya akan mendekati nilai akhir ini, dan dengan setiap iterasi, perbedaannya akan semakin kecil antar diagonal-diagonalnya, dengan diagonal terakhir memiliki nilai paling akurat.
+
+	      Maka dari itu, untuk memperoleh hasil integrasi, diambil elemen diagonal pada baris terakhir, yaitu \(R(j,j)\). Dengan demikian, dapat disimpulkan hasil integrasi melalui Romberg sebagai
+	      \begin{equation*}
+		      \begin{split}
+			      \int_{a}^{b} f(x) \,dx & = R(j,j)
+		      \end{split}
+	      \end{equation*}
+\end{enumerate}
+
+Dalam paper ini, penulis diberikan sebuah fungsi probabilitas suatu variabel acak Z dengan distribusi normal \(< z\) dengan fungsi integral berikut:
 \begin{equation*}
 	\begin{split}
-		p_{2}(x) & = f(a)+\frac{f(c)-f(a)}{c-a}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c)
+		P(Z \le z ) & = \phi(z) = \int_{-\infty}^{z} \frac{1}{\sqrt{2\pi}}e ^{\frac{-z^2}{2}} \,dz
 	\end{split}
 \end{equation*}
 
-Dengan demikian, diperoleh rumus pendekatan berikut dengan menghitung integral dari polinomial di atas.
+Tujuan dari penelitian ini adalah untuk membuktikan aproksimasi nilai integral pada interval \([a, b]\) dengan ketiga metode di atas untuk menghitung probabilitas \(P(a \le Z \le b)\) memiliki eror (perbandingan dengan nilai aktual) kurang dari \emph{TOL} yang diberikan.
 
-\begin{flalign*}
-	S_{f} & = \int_{a}^{b}p_{2}(x)dx                                                                                         &  & \\
-	      & = \int_{a}^{b}\left \{ f(a)+\frac{f(c)-f(a)}{(c-a)}(x-a)+\frac{f(b)-2f(c)+f(a)}{(c-a)^{2}}(x-a)(x-c) \right \}dx &  & \\
-	      & = \frac{(b-a)}{6}\left \{ f(a)+4f(c)+f(b) \right \}                                                              &  &
-\end{flalign*}
-
-Metode Simpson dapat memberikan hasil yang eksak untuk polinomial dengan orde dua (\(\mathrm{f(x)=x^{2}}\)).
-
-Aturan komposit mendefinisikan pendekatan pembagian integrasi ke dalam beberapa subinterval yang ukurannya lebih kecil. Aturan ini didasari oleh salah satu sifat integral definit berikut.
-
-\begin{equation*}
-	\begin{split}
-		\int_{a}^{b}f(x)dx=\int_{a}^{c}f(x)dx+\int_{c}^{b}f(x)dx
-	\end{split}
-\end{equation*}
-
-Misalkan pada interval \(\mathrm{[a,b]}\) didefinisikan titik-titik \(\mathrm{a=x_{0}<x_{1}<...<x_{n}=b}\), maka didapatkan persamaan integral berikut.
-
-\begin{equation*}
-	\begin{split}
-		\int_{a}^{b}f(x)dx=\sum_{i=1}^{n}\int_{x_{i-1}}^{x_{i}}f(x)dx
-	\end{split}
-\end{equation*}
-
-Dengan menerapkan aturan komposit pada metode Simpson (\emph{n} merupakan jumlah partisi yang dibentuk untuk menyelesaikan permasalahan), didapatkan rumus berikut sebagai rumus metode komposit Simpson.
-
-\begin{equation*}
-	\begin{split}
-		\int_{a}^{b}f(x)dx=\frac{1}{6}\sum_{i=1+2}^{n-1}\left \{ f(x_{i-1})+4f(x_{i})+f(x_{i+1}) \right \}
-	\end{split}
-\end{equation*}
-
-Metode komposit Simpson dapat digunakan selama kondisi \(\mathrm{(x_{i+1}-x_{i-1}) \bmod n}\) bernilai genap.
-
-2. \emph{Adaptive Method}
-
-Adaptive Method merupakan metode perhitungan yang dapat menyelesaikan permasalahan pengambilan step-size. Step-size yang kecil cenderung akurat meski dengan time-complexity yang lebih. Namun pengambilan step-size yang wildly varying dapat berkendala.  Step-size penting untuk menemukan TOL eror.
-
-Solusi Adaptive Quadrature menggunakan ekstraploasi dengan melalui pendekatan dengan pembagian subinterval, hal ini menyebabkan pemilihan criteria step-size dilakukan sembari kalkulasi yang sesuai. Pada penelitian ini penulis akan menggunakan Adaptive Quadrature Metode Trapezodial sebagai berikut:
-\includegraphics[scale=0.4, center]{adapt.jpg}
-Untuk setiap pencarian kriterianya, akan didapatkan S[a,c]+S[c,b] dengan a<c<b pada interval [a,b] yang mengaproksimasi S[a,b]. Pengecekan dapat dilakukan antara S[a,b]-(S[a,c]+S[c,b]) hingga memenuhi kriteria 3*TOL.
-
-(belum nambahin adaptive teori)
-
-3. \emph{Romberg Method}
-\emph{Romberg Integration} merupakan metode integrasi yang menggunakan prinsip \emph{composite trapezoidal rule} dan meningkatkan akurasi dengan melakukan ekstrapolasi melalui \emph{Richardson's Extrapolation}.
-
-\emph{Romberg} bekerja dengan menggunakan \emph{composite trapezoidal rule} sebagai basis dari perhitungan dan melakukan iterasi dengan melakukan pembagian interval untuk meningkatkan akurasi. Basis ini diiterasi per-baris pada suatu tabel Romberg yang memiliki ukuran \(R(n,n)\) melalui rumus
-
-\begin{equation*}
-	\begin{split}
-		R(1,1) & = (b-a)\frac{f(a)+f(b)}{2} \\
-		R(j,1) & = \frac{1}{2}R_{j-1,1}+h_j\sum_{i=1}^{2^{j-2}}f(a+(2i-1)h_j)
-	\end{split}
-\end{equation*}
-
-Jika dilihat, \(R(1,1)\) perlu diinisiasi terlebih dahulu karena untuk iterasi berikutnya, akan menggunakan hasil dari iterasi sebelumnya karena bersifat \emph{evolutionary} dengan arti meningkatkan akurasi dari iterasi sebelumnya dengan membagi interval \(h\) menjadi lebih kecil. Nilai \(h\) ini diperkecil setiap iterasi melalui rumus
-
-\begin{equation*}
-	\begin{split}
-		h_j & = \frac{b-a}{2^{j-1}}
-	\end{split}
-\end{equation*}
-
-Dari sini, kita bisa membentuk tabel Romberg \(R\) yang memiliki iterasi \emph{composite trapezoidal rule} dengan iterasi setiap baris, di mana semakin banyak iterasi (dan baris semakin ke bawah), maka akurasi akan semakin meningkat karena memiliki jarak interval \(h\) yang semakin kecil.
-
-Untuk setiap baris, kita bisa menemukan akurasi yang lebih tinggi dengan mengekstrapolasi menggunakan \emph{Richardson's Extrapolation} yang mengekstrapolasi hasil dari \emph{composite trapezoidal rule} yang diperoleh. Rumus \emph{Richardson's Extrapolation} yang sudah diadaptasi untuk algoritma Romberg ini dapat dilihat sebagai berikut
-
-\begin{equation*}
-	\begin{split}
-		R_{j,k} & = \frac{4^{k-1}R_{j,k-1}-R_{j-1,k-1}}{4^{k-1}-1}
-	\end{split}
-\end{equation*}
-
-Dengan demikian, kita bisa mengerti bahwa algoritma Romberg melakukan integrasi dengan membangun tabel Romberg \(R\) dengan ukuran \(R(n,n)\) dan mengisi tabel tersebut sehingga membentuk \emph{lower triangular matrix} di mana setiap baris merupakan iterasi \emph{composite trapezoidal rule} dan setiap kolom merupakan peningkatan akurasi dari \emph{composite trapezoidal rule} baris tersebut menggunakan \emph{richardson's extrapolation} dengan meningkatkan \emph{order of accuracy} melalui hasil yang diperoleh pada iterasi-iterasi sebelumnya (yang akan dibahas pada \emph{subsection} toleransi eror di bawah). Dengan demikian, sebuah tabel Romberg yang dihasilkan dapat divisualisasikan sebagai berikut
-
-\begin{center}
-	\begin{tabular}{ c | c c c c c }
-
-		j/k        & \(R(j,0)\) & \(R(j,1)\) & \(R(j,2)\) & \(R(j,3)\) & \(\cdots\) \\
-		\hline
-		0          & \(R(0,0)\) & -          & -          & -          & -          \\
-		1          & \(R(1,0)\) & \(R(1,1)\) & -          & -          & -          \\
-		2          & \(R(2,0)\) & \(R(2,1)\) & \(R(2,2)\) & -          & -          \\
-		3          & \(R(3,0)\) & \(R(3,1)\) & \(R(3,2)\) & \(R(3,3)\) & -          \\
-		\(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\ddots\) \\
-	\end{tabular}
-\end{center}
-
-Sesuai dengan prinsip yang dijelaskan di atas, akurasi ditingkatkan dengan ekstrapolasi setiap kolomnya dengan semakin meningkat kolom (semakin ke kanan), maka hasil akan semakin akurat. Dengan demikian, nilai paling akurat untuk setiap iterasi berada pada diagonal matriks tersebut.
-
-Hal ini menciptakan suatu sifat/fenomena konvergensi, di mana nilai hasil integrasi akan semakin konvergen menuju suatu solusi perhitungan untuk setiap diagonal yang ada. Apabila nilai diagonal sudah mencapai hasil, maka akan bersifat konvergen di mana hasil komputasi pada diagonal-diagonal sebelumnya akan mendekati nilai akhir ini, dan dengan setiap iterasi, perbedaannya akan semakin kecil antar diagonal-diagonalnya, dengan diagonal terakhir memiliki nilai paling akurat.
-
-Maka dari itu, untuk memperoleh hasil integrasi, diambil elemen diagonal pada baris terakhir, yaitu \(R(j,j)\). Dengan demikian, dapat disimpulkan hasil integrasi melalui Romberg sebagai
-\begin{equation*}
-	\begin{split}
-		\int_{a}^{b} f(x) \,dx & = R(j,j)
-	\end{split}
-\end{equation*}
-
-
-Dalam paper ini, penulis diberikan sebuah fungsi probabilitas suatu variabel acak Z dengan distribusi normal kurang dari \emph{z} dengan fungsi integral berikut
-
-\includegraphics[scale=0.6, center]{func2.jpg}
-
-Tujuan dari penelitian ini adalah untuk membuktikan aproksimasi nilai integral pada interval \([a, b]\) dengan ketiga metode di atas untuk menghitung probabilitas P(a kecil Z kecil B) memiliki error (perbandingan dengan nilai aktual) kurang dari \emph{TOL} yang diberikan.
 
 \section{Implementasi Metode Composite Simpson}
 
@@ -469,9 +499,9 @@ Dengan demikian, dapat disimpulkan bahwa kompleksitas secara kasar untuk komputa
 \par Demikian pada pengerjaan pada paper ini digunakan fungsi MATLAB/Octave, sehingga fungsi distribusi normal di persoalan dapat dituliskan:
 \begin{center}
 	\begin{lstlisting}[language=Octave]
-function res = func(z)
-	res = (1/sqrt(2.*pi)).*exp((-z.^2)/2);
-endfunction
+	function res = func(z)
+		res = (1/sqrt(2.*pi)).*exp((-z.^2)/2);
+	endfunction
 	\end{lstlisting}
 \end{center}
 
@@ -497,19 +527,19 @@ Dari penjelasan \emph{Adaptive Method} dengan \emph{Trapezoid Rule} di atas, pen
 \begin{center}
 	\begin{lstlisting}[language=Octave]
 		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
-		c = (a+b)/2;      % evaluate f in midpoint
-		fa = f(a); fb = f(b); fc = f(c);
-	  
-		Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
-		Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
-		Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
-	  
-		if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
-		  Q = Q2+Q3;   %accept trapezoid rule value
-		else
-		  Q = TrapezoidAdaptive(f, a,c, Tol/2, ori) + TrapezoidAdaptive(f,c,b, Tol/2, ori); % use algorithm for [a,c] and [c,b]
-		end
-	  end
+			c = (a+b)/2;      % evaluate f in midpoint
+			fa = f(a); fb = f(b); fc = f(c);
+		
+			Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
+			Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
+			Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
+		
+			if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
+			Q = Q2+Q3;   %accept trapezoid rule value
+			else
+			Q = TrapezoidAdaptive(f, a,c, Tol/2, ori) + TrapezoidAdaptive(f,c,b, Tol/2, ori); % use algorithm for [a,c] and [c,b]
+			end
+	  	end
 	\end{lstlisting}
 \end{center}
 
@@ -536,7 +566,7 @@ Untuk melihat hasil implementasi, akan digunakan input dengan spesifikasi beriku
 	\end{lstlisting}
 \end{center}
 
-Pada fungsi pengerjaan yang dibangun di atas, penulis menggunakan asumsi untuk penggunaan bilangan \(-\infty\) disubstitusikan dengan bilangan yang sangat kecil dalam fungsi di atas atau digunakan nilai \lstinline{1e-4} pada variabel minInf. Dikarenakan Adaptive Method merupakan fungsi rekursi, maka dengan batas bawah \(-\infty\) atau dengan bilangan yang lebih kecil dari \lstinline{1e-4} akan menimbulkan error max depth recursion.
+Pada fungsi pengerjaan yang dibangun di atas, penulis menggunakan asumsi untuk penggunaan bilangan \(-\infty\) disubstitusikan dengan bilangan yang sangat kecil dalam fungsi di atas atau digunakan nilai \lstinline{1e-4} pada variabel minInf. Dikarenakan Adaptive Method merupakan fungsi rekursi, maka dengan batas bawah \(-\infty\) atau dengan bilangan yang lebih kecil dari \lstinline{1e-4} akan menimbulkan error \emph{max depth recursion}.
 Seperti apa yang sudah dirumuskan pada bagian sebelumnya, akan dilakukan dua buah pemanggilan dengan interval yang berbeda yang nilai aproksimasi masing-masing interval akan disimpan pada variabel \(Pa\) dan \(Pb\). Hasil integrasi yang memenuhi persamaan \(P(a \le Z \le b)\) adalah dengan hasil selisih kedua pendekatan di atas \(P(Z \le b ) - P(Z \le a )\).
 
 Untuk kasus dengan spesifikasi input batas bawah \emph{a = -1} dan batas atas \emph{b = 1.0} akan menghasilkan \emph{output} dengan dua kali pemanggilan fungsi dengan interval berbeda sebagai berikut:
@@ -588,23 +618,23 @@ Dengan tingkat perbedaan pada angka \lstinline{1e-07}, penulis dapat mengatakan 
 Diketahui bentuk dari aturan \emph{Trapezodial} \(S[a,b]\) pada interval \([a,b]\), yaitu:
 \begin{equation*}
 	\begin{split}
-		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^(3)\frac{f^{''}(c_2)}{12}
+		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^{(3)}\frac{f^{''}(c_2)}{12}
 	\end{split}
 \end{equation*}
 
 dengan \lstinline{a < c_0 < b} dimana \lstinline{h = b - a} dimana variabel c yakni nilai tengah antara variabel a dan b. Dengan begitu untuk kedua interval yang dipisah menjadi dua tersebut digambarkan dengan rumus:
 \begin{equation*}
 	\begin{split}
-		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^(3)\frac{f^{''}(c_1)}{12} + S_{[c,b]} - \frac{h^(3)}{8}\frac{f^{''}(c_2)}{12} \\
-		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} + S_{[c,b]} - \frac{h^(3)}{4} \frac{f^{''}(c_3)}{12}
+		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} - h^{(3)}\frac{f^{''}(c_1)}{12} + S_{[c,b]} - \frac{h^{(3)}}{8}\frac{f^{''}(c_2)}{12} \\
+		\int_{a}^{b} f(x) \,dx & = S_{[a,b]} + S_{[c,b]} - \frac{h^{(3)}}{4} \frac{f^{''}(c_3)}{12}
 	\end{split}
 \end{equation*}
 
 Dengan begitu \emph{Adaptive Method} dengan aturan Trapezoid dan aturan titik tengah akan mengatur pembagian sub-interval menyesuaikan fungsi yang diintegrasi pada interval tertentu dan kebutuhan akurasi. Karena dilakukan untuk setiap subinterval, eror global tidak diketahui dan dibutuhkan pendekatan eror yang diketahui bahwa kita dapat mengatur nilai eror yang digambarkan sebagai berikut:
 \begin{equation*}
 	\begin{split}
-		S_{[a,b]} - (S_{[a,c]} + S_{[c,b]})  = -\frac{h^(3)}{4}\frac{f^{''}(c_3)}{12} + h^(3)\frac{f^{''}(c_0)}{12} \\
-		\approx \frac{3}{4} h^(3)\frac{f^{''}(c_3)}{12}
+		S_{[a,b]} - (S_{[a,c]} + S_{[c,b]})  = -\frac{h^{(3)}}{4}\frac{f^{''}(c_3)}{12} + h^{(3)}\frac{f^{''}(c_0)}{12} \\
+		\approx \frac{3}{4} h^{(3)}\frac{f^{''}(c_3)}{12}
 	\end{split}
 \end{equation*}
 
@@ -675,14 +705,39 @@ Pembuktian melalui eksekusi percobaan pada bagian sebelumnya, penulis membanding
 	      yang hampir serupa di atas yaitu untuk \(P(a \le Z \le b)= 1.123183690499019e-08\)  dan \(P(Z \le b ) - P(Z \le a ) = 3.181731832446744e-07\).
 	      Dengan begitu dapat dikatakan fungsi aproksimasi dengan metode
 	      Adaptive Trapezoid ini sudah cukup akurat menyesuaikan dengan fungsi bawaan Octave yaitu \lstinline{quadgk} dan utamanya \lstinline{normcdf} yang merupakan fungsi distribusi normal.
+
+	\item
+	      Pengecekan hasil eror komputasi juga dapat dilakukan dengan menyamakan hasil nilai eror yang didapat pada fungsi di atas dengan nilai asli pada Tabel Z yang ada. Didapatkan perbandingan yang digambarkan pada tabel berikut ini:
+	      \begin{center}
+		      \begin{table}[H] % Add the following just after the closing bracket on this line to specify a position for the table on the page: [h], [t], [b] or [p] - these mean: here, top, bottom and on a separate page, respectively
+			      \centering % Centers the table on the page, comment out to left-justify
+			      \begin{tabular}{cccccc}
+				      \toprule
+				      Input a & Input b & Tabel Z   & TOL  & Hasil Adaptive & Error (\%) \\ % Column names row
+				      \midrule
+				      0       & 0.01    & 0.0040    & 1e-4 & 3.9895e-03     & 1.05e-05   \\
+				      0.3     & 0.32    & 0.0076    & 1e-4 & 7.6055e-03     & 5.4642e-06 \\
+				      0.5     & 0.53    & 0.007     & 1e-4 & 0.010482       & 3.4816e-03 \\
+				      1.1     & 1.15    & 0.0105941 & 1e-4 & 0.010594       & 8.0155e-08 \\
+				      1.4     & 1.49    & 0.0127    & 1e-4 & 0.012645       & 5.5458e-05 \\
+				      1.9     & 1.97    & 0.0043    & 1e-4 & 4.2974e-03     & 2.5911e-06 \\
+				      2.2     & 2.29    & 0.0029    & 1e-4 & 2.8930e-03     & 7.0240e-03 \\
+
+				      \bottomrule % Bottom horizontal line
+			      \end{tabular}
+			      \smallskip
+			      \caption{Hasil perbandingan nilai aproksimasi integrasi dengan Tabel Z} % Table caption, can be commented out if no caption is required
+			      \label{tab: template} % A label for referencing this table elsewhere, references are used in text as \ref{label}
+		      \end{table}
+	      \end{center}
 \end{enumerate}
 
-Percobaan di atas jika dijalankan dengan serangkaian TOL yang berbeda juga akan menghasilkan hasil error pembanding dengan \lstinline{quadgk} dan \lstinline{normcdf} di atas, digambarkan pada grafik di bawah.
-(Percobaan dengan interval \([0,0.01]\)) \newpage
+Percobaan di atas jika dijalankan dengan serangkaian TOL yang berbeda yakni \(TOL = [1e-2,1e-4,1e-5, 1e-6, 1e-10, 1e-12]\) juga akan menghasilkan hasil error pembanding dengan \lstinline{quadgk} dan \lstinline{normcdf} di atas, digambarkan pada grafik di bawah.
+(Percobaan dengan interval \([-1,3]\))
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.5\textwidth]{plot baru adaptive.jpg}
+	\includegraphics[width=0.5\textwidth]{bagus_adaptive.jpg}
 	\caption{Grafik Nilai Eror Hasil Komputasi Adaptive dengan fungsi bawaan (quadgk dan normcdf)}
 	\label{fig:difGraphAdaptive}
 \end{figure}
@@ -690,33 +745,40 @@ Percobaan di atas jika dijalankan dengan serangkaian TOL yang berbeda juga akan 
 Dengan begitu percobaan aproksimasi metode Adaptive dengan aturan Trapezoid mengeluarkan hasil yang sesuai dan memiliki akurasi yang sesuai serta menyesuaikan dengan TOL eror yang diberikan. Hasil komputasi juga sesuai atau mendekati dengan fungsi distribusi normal dan hasil integrasi aktual fungsi bawaan. Diperlihatkan juga dengan plot eror di atas yang fungsinya semakin mendekati nol.
 
 \subsection{Analisis Kompleksitas}
-Berikut dilakukan perhitungan FLOP (\emph{floating-point operations}) pada implementasi kode.
+Berikut dilakukan perhitungan kompleksitas berdasarkan \emph{function call} pada implementasi kode berikut:
 
 \begin{center}
 	\begin{lstlisting}[language=Octave]
 		function Q = TrapezoidAdaptive(f,a,b,Tol,ori)
-		c = (a+b)/2;      % evaluate f in midpoint
-		fa = f(a); fb = f(b); fc = f(c);
+			c = (a+b)/2;      % evaluate f in midpoint
+			fa = f(a); fb = f(b); fc = f(c);
 
-		Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
-		Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
-		Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
+			Q1 = (b-a)*(fa+fb)/2;        % Trapezoid rule for S[a,b]
+			Q2 = (c-a)*(fc+fa)/2;        % Trapezoid rule for S[a,c]
+			Q3 = (b-c)*(fb+fc)/2;        % Trapezoid rule for S[b,c]
 
-		if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
-			Q = Q2+Q3;   %accept trapezoid rule value
-		else
-			Q = TrapezoidAdaptive(f,a,c,Tol/2,ori) + TrapezoidAdaptive(f,c,b,Tol/2,ori);
-			% use algorithm for [a,c] and [c,b]
+			if abs(Q1-Q2-Q3)<= 3*Tol*(b-a)/ori
+				Q = Q2+Q3;   %accept trapezoid rule value
+			else
+				Q = TrapezoidAdaptive(f,a,c,Tol/2,ori) + TrapezoidAdaptive(f,c,b,Tol/2,ori);
+				% use algorithm for [a,c] and [c,b]
+			end
 		end
-	end
 	\end{lstlisting}
 \end{center}
 
-\emph{Adaptive quadrature} merupakan metode aproksimasi fungsi integrasi yang rekursif dengan setiap kondisi yang belum memenuhi akan membagi \emph{problem} menjadi 2 buah \emph{sub-problem}. Perhitungan kompleksitas berikut ini akan dihitung dengan menghitung \emph{function call}. Untuk setiap pemanggilan fungsi di atas dilakukan 3 \emph{function call} untuk mendapatkan \emph{f(a), f(b), dan f(c)}.
-Pengembalian nilai aproksimasi adalah penjumlahan hasil aproksimasi nilai integrasi interval yang dipecah menjadi TrapezoidAdaptive(f,a,c,Tol/2,ori) dan TrapezoidAdaptive(f,c,b,Tol/2,ori). Hasil penggabungan keduanya bernilai O(1). Pemanggilan perhitungan untuk Q1, Q2, dan Q3 juga bernilai O(1). Setiap pemanggilan fungsi TrapezoidAdaptive maka besar interval akan semakin pendek menjadi n/2 dengan n adalah panjang interval yakni \emph{n = b-a}.
-Dengan pembentukan fungsi \emph{recursion tree}-nya ketinggian \emph{tree} mencapai \emph{log(n)+1} dan secara \emph{recursion equation} digambarkan sebagai berikut:
-T(n) = T(n/2) + T(n/2) + O(1)
-Dengan \emph{cost} yang sama untuk tiap pemanggilan fungsinya maka total \emph{cost} bernilai \emph{\(O(n log n + 1)\)}. Dengan 3 kali pemanggilan \emph{function call} di setiap fungsi, maka total pemanggilan \emph{function call} secara keseluruhan \emph{asymptotic} dituliskan sebagai \emph{\(O(3*n log n)\)}.
+\emph{Adaptive quadrature} merupakan metode aproksimasi fungsi integrasi rekursif dengan setiap kondisi yang belum memenuhi akan membagi \emph{problem} menjadi dua buah \emph{sub-problem} interval baru. Untuk setiap pemanggilan fungsi di atas dilakukan 3 \emph{function call} untuk mendapatkan \emph{f(a), f(b), dan f(c)}.
+
+Pengembalian nilai aproksimasi adalah penjumlahan hasil aproksimasi nilai integrasi interval yang dipecah menjadi \emph{TrapezoidAdaptive(f,a,c,Tol/2,ori)} dan \emph{TrapezoidAdaptive(f,c,b,Tol/2,ori)}. Hasil penggabungan keduanya memiliki kompleksitas \emph{O(1)}. Pemanggilan perhitungan untuk \emph{Q1, Q2, dan Q3} juga bernilai \emph{O(1)}. Setiap pemanggilan fungsi \emph{TrapezoidAdaptive} maka besar interval akan semakin pendek menjadi \emph{n/2} dengan n adalah panjang interval yakni \emph{n = b - a}.
+
+Dengan pembentukan pohon rekursi dari pecahan \emph{sub-problem} interval tiap pemanggilan, didapatkan ketinggian \emph{tree} mencapai \emph{log(n)+1} yang memiliki \emph{cost} yang sama. Maka persamaan rekurensinya dapat digambarkan sebagai berikut:
+\begin{equation*}
+	\begin{split}
+		T(n) = T(\frac{n}{2}) + T(\frac{n}{2}) + O(1)
+	\end{split}
+\end{equation*}
+
+Dengan \emph{cost} yang sama untuk tiap pemanggilan fungsinya maka total \emph{cost} bernilai \emph{cn (lg n + 1)}. untuk 3 kali pemanggilan \emph{function call} di setiap fungsi, maka total pemanggilan \emph{function call} secara keseluruhan, mengabaikan \emph{low-order term} dan konstan \emph{c}, \emph{asymptotic equation} untuk kompleksitas \emph{function call} fungsi di atas dituliskan sebagai \emph{O(3n log n)}.
 
 \section{Implementasi Algoritma Romberg}
 
