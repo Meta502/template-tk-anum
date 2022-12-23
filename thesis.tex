@@ -481,7 +481,7 @@ Dengan mengambil suku terbesar, kompleksitas FLOPs untuk integrasi dengan metode
 
 % 2 + (n/2)*2 function calls
 
-Namun, kompleksitas juga bisa dihitung dalam segi \emph{function call}. Apabila kita ingin menghitung dalam segi ini, maka terdapat 2 \emph{function calls} di luar \emph{loop} untuk inisiasi nilai awal variabel \emph{res} dan 2 \emph{function calls} di dalam \emph{loop} untuk mencari nilai integrasi (\emph{res}). Dengan mengambil suku terbesar, kompleksitas \emph{function call} pada metode komposit Simpson adalah berupa \(O(2*(n/2))\) (dengan kata lain, \(O(n)\)).
+Namun, kompleksitas juga bisa dihitung dari segi \emph{function call}. Apabila kita ingin menghitung dari segi ini, maka terdapat 2 \emph{function calls} di luar \emph{loop} untuk inisiasi nilai awal variabel \emph{res} dan 2 \emph{function calls} di dalam \emph{loop} untuk mencari nilai integrasi (\emph{res}). Dengan mengambil suku terbesar, kompleksitas \emph{function call} pada metode komposit Simpson adalah berupa \(O(2*(n/2))\) (dengan kata lain, \(O(n)\)).
 
 Dengan demikian, dapat disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n/2)\) dan untuk \emph{function call} adalah \(O(n)\) dengan \(n\) adalah jumlah partisi integrasi yang dihitung pada awal eksekusi program.
 
