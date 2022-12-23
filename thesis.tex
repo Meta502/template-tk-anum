@@ -121,7 +121,7 @@ Integrasi numerik adalah teknik untuk melakukan kalkulasi dan aproksimasi pada s
 
 	      Untuk setiap pembagian interval \([a_j,b_j]\) dilakukan perhitungan aproksimasi untuk area interval tersebut \(I_j\). Jika kedua interval yang telah dibagi dan dikomputasi sudah konvergen dan bernilai cenderung dekat, maka dapat disimpulkan nilai aprokskimasi untuk integrasi \(I_j\) dan \(I_{j+1}\) mendekati akurasi yang diinginkan dan dapat dikembalikan nilainya. Jika belum mendekati, maka interval \([a_j, b_j]\) menjadi dua buah interval dan melakukan pemanggilan rekursif ke fungsi pada masing-masing sub-interval.
 
-	      Solusi Adaptive Quadrature menggunakan ekstraploasi dengan melalui pendekatan dengan pembagian subinterval, hal ini menyebabkan pemilihan \emph{criteria step-size} dilakukan bersamaan dengan kalkulasi yang sesuai. Pada penelitian ini penulis akan menggunakan Adaptive Quadrature Trapezodial sebagai berikut:
+	      Solusi Adaptive Quadrature menggunakan ekstrapolasi dengan melalui pendekatan dengan pembagian subinterval, hal ini menyebabkan pemilihan \emph{criteria step-size} dilakukan bersamaan dengan kalkulasi yang sesuai. Pada penelitian ini penulis akan menggunakan Adaptive Quadrature Trapezodial sebagai berikut:
 
 	      \begin{equation*}
 		      \begin{split}
@@ -1150,7 +1150,9 @@ Salah satu perkiraan alasan mengapa terjadi seperti ini adalah tipe fungsi yang 
 Maka dari itu, bisa disimpulkan bahwa kompleksitas secara kasar untuk komputasi FLOPs adalah \(O(n*j + n*2^j)\) dan untuk \emph{function call} adalah \(O(n*2^j)\) dengan \(n\) adalah ukuran tabel Romberg yang bergantung pada fungsi dan batas toleransi serta nilai masukan, dan \(j\) bergantung pada \(n\).
 
 \section{Kesimpulan}
-Kesimpulan disini.
+Pada laporan ini, kami telah berhasil mendemonstrasikan bahwa integrasi numerik fungsi \emph{z-table} dapat dilakukan menggunakan tiga metode numerik, yaitu metode komposit \emph{Simpson}, metode \emph{adaptive}, dan metode Romberg. Ketiga metode tersebut menghasilkan hasil yang cukup akurat dibandingkan hasil integrasi langsung dengan fungsi \emph{QuadGK} dan \emph{NormCDF}, namun masing-masing metode memiliki kelebihan dan kelemahan dibandingkan dengan metode lainnya.
+
+Berdasarkan percobaan yang telah kami lakukan serta analisis kompleksitas yang dilakukan pada ini bagian sebelumnya, kami menyimpulkan bahwa metode komposit \emph{Simpson} memiliki kompleksitas yang paling sederhana, yakni \(O(n/2)\) secara tinjauan FLOPs dan \(O(n)\) secara tinjauan \emph{function call}. Namun, akurasi yang dimiliki oleh metode komposit \emph{Simpson} tidak cukup tinggi apabila dibandingkan dengan metode lainnya. Metode \emph{adaptive} memiliki akurasi yang lebih tinggi dibandingkan metode komposit \emph{Simpson} (dengan mempertahankan penggunaan pembagian interval tetapi dilakukan pendekatan secara adaptif), namun kompleksitasnya lebih tinggi dibandingkan metode komposit \emph{Simpson}. Metode Romberg sendiri memiliki akurasi yang paling tinggi dibandingkan metode lainnya (dengan menggunakan ekstrapolasi), namun memiliki kompleksitas yang paling tinggi karena dapat berkembang secara pangkat dua untuk variabel \emph{j}.
 
 % % Example of a table from http://www.latextemplates.com/template/professional-table
 
